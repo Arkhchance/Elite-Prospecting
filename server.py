@@ -11,7 +11,7 @@ def broadcast_data (sock, message):
 	for socket in CONNECTION_LIST:
 		if socket != server_socket :
 			try :
-				socket.sendall(message)
+				socket.sendall(message.encode())
 			except :
 				# broken socket connection may be, chat client pressed ctrl+c for example
 				socket.close()
@@ -57,7 +57,7 @@ if __name__ == "__main__":
 					# a "Connection reset by peer" exception will be thrown
 					data = sock.recv(RECV_BUFFER)
 					if data:
-						broadcast_data(sock,data)
+						broadcast_data(sock,data.decode())
 
 				except:
 					broadcast_data(sock, "Client (%s, %s) is offline" % addr)
