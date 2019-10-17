@@ -22,26 +22,32 @@ def plugin_prefs(parent,cmdr,is_beta):
     this.ltd = tk.IntVar(value=config.getint("ep_LTD"))
     this.painite = tk.IntVar(value=config.getint("ep_Painite"))
 
-    nb.Label(frame,text="Set your value and restart EDMC").grid()
-    nb.Checkbutton(frame, text='Search for LTD > ', variable=this.ltd).grid(row=3, column=0, padx=PADX, pady=PADY, sticky=tk.EW)
-    this.ltd_threshold = nb.Entry(frame)
-    this.ltd_threshold.grid(row=3, column=1, padx=PADX, pady=PADY, sticky=tk.EW)
 
-    nb.Checkbutton(frame, text='Search for Painite', variable=this.painite).grid(row=4, column=0, padx=PADX, pady=PADY, sticky=tk.EW)
-    this.painite_threshold = nb.Entry(frame)
-    this.painite_threshold.grid(row=4, column=1, padx=PADX, pady=PADY, sticky=tk.EW)
+
+    this.ip_label = nb.Label(frame,text="Server IP")
+    this.ip_label.grid(row=3, padx=PADX, sticky=tk.W)
+    this.server_ip = nb.Entry(frame)
+    this.server_ip.grid(row=3, column=1, padx=PADX, pady=PADY, sticky=tk.EW)
+
+    this.port_label = nb.Label(frame,text="Server Port")
+    this.port_label.grid(row=4, padx=PADX, sticky=tk.W)
+    this.server_port = nb.Entry(frame)
+    this.server_port.grid(row=4, column=1, padx=PADX, pady=PADY, sticky=tk.EW)
 
     nb.Label(frame).grid(sticky=tk.W) # big spacer
 
-    this.ip_label = nb.Label(frame,text="Server IP")
-    this.ip_label.grid(row=13, padx=PADX, sticky=tk.W)
-    this.server_ip = nb.Entry(frame)
-    this.server_ip.grid(row=13, column=1, padx=PADX, pady=PADY, sticky=tk.EW)
+    nb.Label(frame,text="Set your value and restart EDMC").grid()
+    nb.Checkbutton(frame, text='Search for LTD greater than', variable=this.ltd).grid(row=9, column=0, padx=PADX, pady=PADY, sticky=tk.EW)
+    this.ltd_threshold = nb.Entry(frame)
+    this.ltd_threshold.grid(row=9, column=1, padx=PADX, pady=PADY, sticky=tk.EW)
 
-    this.port_label = nb.Label(frame,text="Server Port")
-    this.port_label.grid(row=14, padx=PADX, sticky=tk.W)
-    this.server_port = nb.Entry(frame)
-    this.server_port.grid(row=14, column=1, padx=PADX, pady=PADY, sticky=tk.EW)
+    nb.Checkbutton(frame, text='Search for Painite greater than', variable=this.painite).grid(row=10, column=0, padx=PADX, pady=PADY, sticky=tk.EW)
+    this.painite_threshold = nb.Entry(frame)
+    this.painite_threshold.grid(row=10, column=1, padx=PADX, pady=PADY, sticky=tk.EW)
+
+
+
+
 
     load_value()
     return frame
