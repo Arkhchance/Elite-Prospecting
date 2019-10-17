@@ -24,10 +24,10 @@ lookFor = "LowTemperatureDiamond"
 threshold = 18
 
 #serveraddr
-ip = "37.59.36.212"
+ip = "127.0.0.1"
 
 #port
-port = 44987
+port = 44988
 
 class Client(Node):
 
@@ -53,11 +53,6 @@ class Client(Node):
 	def recvs(self , delimeter):
 		while True:
 			msg = self.recvMsg(self.sock , delimeter)
-			if msg.replace('\n' , '')=='~q':
-				# self.sock.shutdown(socket.SHUT_RD)
-				self.sock.close()
-				break
-			msg =  msg.replace('\n' , '')
 			print(msg)
 
 def taifFile(logfile,client):

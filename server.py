@@ -4,23 +4,25 @@ import sys
 from threading import Thread
 
 HOST = ''	# Symbolic name meaning all available interfaces
-PORT = 44987	# Arbitrary non-privileged port
+PORT = 44988	# Arbitrary non-privileged port
 
 #Function for handling connections. This will be used to create threads
 def clientthread(conn):
 	#Sending message to connected client
-	conn.send('Welcome to the server.\n') #send only takes string
+	msg = "Welcome\n"
+	conn.send(msg.encode()) #send only takes string
 
 	#infinite loop so that function do not terminate and thread do not end.
 	while True:
 
 		#Receiving from client
 		data = conn.recv(1024)
-		reply = 'R..' + data
+		print("recv : ", data.decode())
+		reply = 'R..' + data.decode()
 		if not data:
 			break
 
-		conn.sendall(reply)
+		conn.sendall(reply.encode())
 
 	#came out of loop
 	conn.close()
