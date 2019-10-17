@@ -27,14 +27,14 @@ threshold = 18
 ip = "127.0.0.1"
 
 #port
-port = "44987"
+port = 44987
 
 class Client(Node):
 
-	def __init__(self , host , port ,usename):
+	def __init__(self , host , port ,username):
 		self.host = host
+		self.username = username
 		self.port = port
-        self.username = username
 		self.sock = socket.socket(socket.AF_INET , socket.SOCK_STREAM)
 
 	def start(self):
@@ -47,7 +47,7 @@ class Client(Node):
 			sys.exit(0)
 
 	def sends(self,msg):
-        message = self.username + " : " + msg
+		message = self.username + " : " + msg
 		self.sendMsg(self.sock , message)
 
 	def recvs(self , delimeter):
