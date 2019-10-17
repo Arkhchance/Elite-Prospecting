@@ -18,6 +18,10 @@ def clientthread(conn):
 		#Receiving from client
 		data = conn.recv(1024)
 		print("recv : ", data.decode())
+        if data.decode().find("quit") :
+            conn.close()
+            return
+
 		if not data:
 			break
 
