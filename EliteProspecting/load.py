@@ -21,13 +21,23 @@ client = None
 this = sys.modules[__name__]
 
 def plugin_prefs(parent,cmdr,is_beta):
-    this.port = tk.IntVar(value=config.get("Port"))
     frame = nb.Frame(parent)
-    nb.Label(frame,text="Hello").grid()
-    nb.Label(frame,text="Commander").grid()
-    nb.Entry(frame,text="settings",variable=this.port).grid()
+
+    this.ltd = tk.IntVar(value=config.getint("ep_LTD"))
+    this.painite = tk.IntVar(value=config.getint("ep_Painite"))
+
+    nb.Label(frame,text="Settings").grid()
+    nb.Checkbutton(frame, text='Search for LTD', variable=this.ltd).grid()
+    nb.Checkbutton(frame, text='Search for Painite', variable=this.painite).grid()
 
     return frame
+
+def prefs_changed(cmdr,is_beta) :
+    print(this.ltd.get())
+    print(this.painite.get())
+    config.set("ep_LTD", this.ltd.get())
+    config.set("ep_Painite", this.painite.get())
+
 
 def plugin_start(plugin_dir):
     global client
@@ -58,7 +68,7 @@ class Client():
 
     def start(self):
         self.sock.connect((self.host , self.port))
-        self.sendMsg("hello")
+        self.sendMsg("New PLayer")
         message = self.recvMsg()
         self.thread  = threading.Thread(target=self.recvs)
         self.thread.start()
