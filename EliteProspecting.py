@@ -68,8 +68,8 @@ def taifFile(logfile,client):
             if data['event'] == "ProspectedAsteroid" :
                 for i in data['Materials']:
                     if i['Name'] == lookFor and i['Proportion'] > threshold :
-                        msg = "I have " + i['Name_Localised'] + " " +str(i['Proportion']) + " %"
-                        client.sends(msg)
+                        msg = i['Name_Localised'] + " {:.2f}  %"
+                        client.sends(msg.format(i['Proportion']))
         else:
             time.sleep(polling)
 
