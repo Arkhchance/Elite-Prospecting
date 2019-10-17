@@ -80,8 +80,8 @@ def plugin_start3(plugin_dir):
 
 def plugin_app(parent):
     this.status = tk.Label(parent, text="", foreground="yellow")
-    size = int(config.get("font_size")) or 14
-    this.status.config(font=("Courier", size))   # Override theme's foreground
+    size = config.get("font_size") or 14
+    this.status.config(font=("Courier", int(size)))   # Override theme's foreground
     return (this.status)
 
 def plugin_start(plugin_dir):
