@@ -35,7 +35,7 @@ def plugin_prefs(parent,cmdr,is_beta):
     this.server_port = nb.Entry(frame)
     this.server_port.grid(row=4, column=1, padx=PADX, pady=PADY, sticky=tk.EW)
 
-    this.font_size_label = nb.Label(frame,text="Server Port")
+    this.font_size_label = nb.Label(frame,text="font size")
     this.font_size_label.grid(row=5, padx=PADX, sticky=tk.W)
     this.font_size = nb.Entry(frame)
     this.font_size.grid(row=5, column=1, padx=PADX, pady=PADY, sticky=tk.EW)
