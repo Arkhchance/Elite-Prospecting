@@ -6,7 +6,7 @@ class Node(object):
 	def recvMsg(self, sock , delimeter):
 		message = ""
 		while True:
-			data = sock.recv(4096)
+			data = sock.recv(4096).decode()
 			if not data:
 				break
 			message+=data
