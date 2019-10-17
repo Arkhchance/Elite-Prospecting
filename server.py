@@ -1,66 +1,57 @@
 #!/usr/bin/python
-
-import socket, sys , signal
+import socket
+import sys
 from threading import Thread
-from Node import Node
 
-ip = "0.0.0.0"
-port = 44987
+HOST = ''	# Symbolic name meaning all available interfaces
+PORT = 44987	# Arbitrary non-privileged port
 
-class Server(Node):
+#Function for handling connections. This will be used to create threads
+def clientthread(conn):
+	#Sending message to connected client
+	conn.send('Welcome to the server.\n') #send only takes string
 
-	def __init__(self , host , port):
-		self.host = host
-		self.port = port
-		self.sock = socket.socket(socket.AF_INET , socket.SOCK_STREAM)
-		self.sock.setsockopt(socket.SOL_SOCKET , socket.SO_REUSEADDR , 1)
-		self.registered_clients = []
+	#infinite loop so that function do not terminate and thread do not end.
+	while True:
 
-	def start(self):
-		self.sock.bind((self.host , self.port))
-		self.sock.listen(3)
-		def chat(sc):
-			while True:
-				message = self.recvMsg(sc , '\n')
-				if not message:
-					break
-				if message.replace('\n' , '')=='~q':
-					self.sendMsg(sc , message)
-					break
-				print(message.replace('\n' , ''))
-				self.sendToAllClients(message , sc)
-				#Later will have to add a method to escape \n in case it is already present in the message.
-			self.deregisterClient(sc)
-			sc.close()
-		while True:
-			sc , peeraddr = self.sock.accept()
-			msg = self.recvMsg(sc , '\n')
+		#Receiving from client
+		data = conn.recv(1024)
+		reply = 'R..' + data
+		if not data:
+			break
 
-			self.sendMsg(sc , 'q\n')
-			self.registerClient(sc)
-			Thread(target=chat , args=(sc,)).start()
+		conn.sendall(reply)
 
-
-	def registerClient(self , sc):
-		if sc not in self.registered_clients:
-			self.registered_clients.append(sc)
-
-	def sendToAllClients(self , msg , sc):
-		for sock in self.registered_clients:
-			if sock is not sc:
-				sock.sendall(msg)
-
-	def deregisterClient(self , sc):
-		if sc in self.registered_clients:
-			self.registered_clients.remove(sc)
+	#came out of loop
+	conn.close()
 
 def main():
-	server = Server(ip , port)
-	try:
-		server.start()
-	except KeyboardInterrupt:
-		print("Ok! stopping the server!")
-		sys.exit(0)
+    s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+    print( 'Socket created')
+
+    #Bind socket to local host and port
+    try:
+    	s.bind((HOST, PORT))
+    except socket.error as msg:
+    	print( 'Bind failed. Error Code : ' + str(msg[0]) + ' Message ' + msg[1])
+    	sys.exit()
+
+    print( 'Socket bind complete')
+
+    #Start listening on socket
+    s.listen(10)
+    print( 'Socket now listening')
+
+    #now keep talking with the client
+    while 1:
+        #wait to accept a connection - blocking call
+    	conn, addr = s.accept()
+    	print( 'Connected with ' + addr[0] + ':' + str(addr[1]))
+
+    	#start new thread takes 1st argument as a function name to be run, second is the tuple of arguments to the function.
+    	Thread(target=clientthread , args=(conn,)).start()
+
+    s.close()
 
 if __name__ == "__main__":
     main()
