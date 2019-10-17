@@ -92,16 +92,14 @@ def plugin_start(plugin_dir):
     client = Client(ip, port)
     client.start()
 
-
 def journal_entry(cmdr,is_beta,system,station,entry,state):
     global client
     global painite
     global ltd
     if entry['event'] == "ProspectedAsteroid":
-        print(ltd," ",painite)
+        this.status["text"] = "Happy!"
+        this.status["foreground"] = "green"
         for i in entry['Materials']:
-            print(i['Name'])
-            print(i['Proportion'])
             if i['Name'] == "LowTemperatureDiamond" and i['Proportion'] > float(ltd) :
                 msg = i['Name_Localised'] + " {:.2f}  %"
                 client.sends(cmdr,msg.format(i['Proportion']))
@@ -138,7 +136,6 @@ class Client():
         threading.Thread(target=self.recvs).start()
 
     def stop(self):
-        print("quitting")
         self.sendMsg("quit")
 
     def sendMsg(self  , message):
@@ -156,4 +153,7 @@ class Client():
         while True:
             msg = self.recvMsg()
             print(msg)
-            print(msg.find("quit"))
+            if msg.find("quit") != -1 :
+                print("closing")
+                self.sock.close()
+                return
