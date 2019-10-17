@@ -5,7 +5,6 @@ import glob
 import os
 import json
 import socket , sys , signal
-from Node import Node
 from threading import Thread
 
 #username
@@ -24,12 +23,12 @@ lookFor = "LowTemperatureDiamond"
 threshold = 18
 
 #serveraddr
-ip = "127.0.0.1"
+ip = "arkhchance.ovh"
 
 #port
 port = 44988
 
-class Client(Node):
+class Client():
 
 	def __init__(self , host , port ,username):
 		self.host = host
@@ -39,20 +38,27 @@ class Client(Node):
 
 	def start(self):
 		self.sock.connect((self.host , self.port))
-		self.sendMsg(self.sock ,"hello")
-		message = self.recvMsg(self.sock , '\n')
+		self.sendMsg("hello")
+		message = self.recvMsg()
 		if message.replace('\n' , '')!='~q':
-			Thread(target=self.recvs , args=('\n',)).start()
+			Thread(target=self.recvs).start()
 		else:
 			sys.exit(0)
 
+	def sendMsg(self  , message):
+		self.sock.sendall(message.encode())
+
+	def recvMsg(self):
+		data = self.sock.recv(4096)
+		return data.decode()
+
 	def sends(self,msg):
 		message = self.username + " : " + msg
-		self.sendMsg(self.sock , message)
+		self.sendMsg(message)
 
-	def recvs(self , delimeter):
+	def recvs(self):
 		while True:
-			msg = self.recvMsg(self.sock , delimeter)
+			msg = self.recvMsg()
 			print(msg)
 
 def taifFile(logfile,client):
@@ -62,24 +68,21 @@ def taifFile(logfile,client):
             if data['event'] == "ProspectedAsteroid" :
                 for i in data['Materials']:
                     if i['Name'] == lookFor and i['Proportion'] > threshold :
+                        msg = ""
                         print("Found " + i['Name_Localised'] + " => " + str(i['Proportion']) + " %")
-                        client.send("test")
+                        client.sends("test")
         else:
             time.sleep(polling)
 
 def main():
     #setup file
-    #fileList = glob.glob(path + "*.log")
-    #latestFile = max(fileList,key=os.path.getctime)
+    fileList = glob.glob(path + "*.log")
+    latestFile = max(fileList,key=os.path.getctime)
 
     client = Client(ip, port, name)
     client.start()
-    msg = "test"
-    while 1:
-        client.sends(msg)
-        time.sleep(3)
-    #print(latestFile)
-    #taifFile(latestFile,client)
+    print("reading : ",latestFile)
+    taifFile(latestFile,client)
 
 
 if __name__ == "__main__":

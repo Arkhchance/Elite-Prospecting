@@ -18,11 +18,10 @@ def clientthread(conn):
 		#Receiving from client
 		data = conn.recv(1024)
 		print("recv : ", data.decode())
-		reply = 'R..' + data.decode()
 		if not data:
 			break
 
-		conn.sendall(reply.encode())
+		conn.sendall(data)
 
 	#came out of loop
 	conn.close()
