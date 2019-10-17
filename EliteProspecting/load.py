@@ -20,10 +20,8 @@ def plugin_prefs(parent,cmdr,is_beta):
     frame.columnconfigure(1, weight=1)
     nb.Label(frame,text="Set your value and restart EDMC").grid()
 
-    this.ltd_p = tk.IntVar(value=config.getint("ep_LTD"))
-    this.painite_p = tk.IntVar(value=config.getint("ep_Painite"))
-
-
+    this.ltd_p = tk.IntVar(value=config.getint("oLTD") and 1)
+    this.painite_p = tk.IntVar(value=config.getint("iPainite") and 1)
 
     this.ip_label = nb.Label(frame,text="Server IP")
     this.ip_label.grid(row=3, padx=PADX, sticky=tk.W)
@@ -42,11 +40,11 @@ def plugin_prefs(parent,cmdr,is_beta):
 
     nb.Label(frame).grid(sticky=tk.W) # big spacer
 
-    nb.Checkbutton(frame, text='Search for LTD greater than', variable=this.ltd).grid(row=9, column=0, padx=PADX, pady=PADY, sticky=tk.EW)
+    nb.Checkbutton(frame, text='Search for LTD greater than', variable=this.ltd_p).grid(row=9, column=0, padx=PADX, pady=PADY, sticky=tk.EW)
     this.ltd_threshold = nb.Entry(frame)
     this.ltd_threshold.grid(row=9, column=1, padx=PADX, pady=PADY, sticky=tk.EW)
 
-    nb.Checkbutton(frame, text='Search for Painite greater than', variable=this.painite).grid(row=10, column=0, padx=PADX, pady=PADY, sticky=tk.EW)
+    nb.Checkbutton(frame, text='Search for Painite greater than', variable=this.painite_p).grid(row=10, column=0, padx=PADX, pady=PADY, sticky=tk.EW)
     this.painite_threshold = nb.Entry(frame)
     this.painite_threshold.grid(row=10, column=1, padx=PADX, pady=PADY, sticky=tk.EW)
 
@@ -67,8 +65,9 @@ def load_value():
     this.font_size.insert(0,font_size)
 
 def prefs_changed(cmdr,is_beta) :
-    config.set("ep_LTD", this.ltd_p.get())
-    config.set("ep_Painite", this.painite_p.get())
+    print("val ", this.ltd_p.get())
+    config.set("oLTD", this.ltd_p.get())
+    config.set("iPainite", this.painite_p.get())
     config.set("LTD_t", this.ltd_threshold.get())
     config.set("Painite_t",this.painite_threshold.get())
     config.set("server_ip",this.server_ip.get())
@@ -92,11 +91,12 @@ def plugin_start(plugin_dir):
     ip = config.get("server_ip") or "127.0.0.1"
     port = config.get("server_port") or 44988
 
-    if config.get("ep_LTD") != None and config.get("ep_LTD") :
+
+    if config.getint("oLTD") != None and config.getint("oLTD") :
         ltd = config.get("LTD_t") or 18
     else :
         ltd = 99
-    if config.get("ep_Painite") != None and config.get("ep_Painite") :
+    if config.getint("iPainite") != None and config.getint("iPainite") :
         painite = config.get("Painite_t") or 25
     else :
         painite = 99
@@ -144,6 +144,7 @@ class Client():
         self.port = port
         self.sock = socket.socket(socket.AF_INET , socket.SOCK_STREAM)
         self.thread = None
+        self.run = True
 
     def start(self):
         try :
@@ -155,11 +156,12 @@ class Client():
             print("Error connecting")
             return
 
-        self.sendMsg("New PLayer")
+        self.sendMsg("New Player")
         message = self.recvMsg()
         threading.Thread(target=self.recvs).start()
 
     def stop(self):
+        self.run = False
         self.sendMsg("quit")
 
     def sendMsg(self  , message):
@@ -174,11 +176,7 @@ class Client():
         self.sendMsg(message)
 
     def recvs(self):
-        while True:
+        while self.run:
             msg = self.recvMsg()
             print(msg)
             add_text(msg)
-            if msg.find("quit") != -1 :
-                print("closing")
-                self.sock.close()
-                return
