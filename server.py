@@ -8,27 +8,27 @@ PORT = 44988	# Arbitrary non-privileged port
 
 #Function for handling connections. This will be used to create threads
 def clientthread(conn):
-	#Sending message to connected client
-	msg = "Welcome\n"
-	conn.send(msg.encode()) #send only takes string
+    #Sending message to connected client
+    msg = "Welcome\n"
+    conn.send(msg.encode()) #send only takes string
 
-	#infinite loop so that function do not terminate and thread do not end.
-	while True:
+    #infinite loop so that function do not terminate and thread do not end.
+    while True:
 
-		#Receiving from client
-		data = conn.recv(1024)
-		print("recv : ", data.decode())
+        #Receiving from client
+        data = conn.recv(1024)
+        print("recv : ", data.decode())
         if data.decode().find("quit") :
             conn.close()
             return
 
-		if not data:
-			break
+        if not data:
+            break
 
-		conn.sendall(data)
-
-	#came out of loop
-	conn.close()
+        conn.sendall(data)
+    
+    #came out of loop
+    conn.close()
 
 def main():
     s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
