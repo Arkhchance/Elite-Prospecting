@@ -20,8 +20,8 @@ def plugin_prefs(parent,cmdr,is_beta):
     frame.columnconfigure(1, weight=1)
     nb.Label(frame,text="Set your value and restart EDMC").grid()
 
-    this.ltd = tk.IntVar(value=config.getint("ep_LTD"))
-    this.painite = tk.IntVar(value=config.getint("ep_Painite"))
+    this.ltd_p = tk.IntVar(value=config.getint("ep_LTD"))
+    this.painite_p = tk.IntVar(value=config.getint("ep_Painite"))
 
 
 
@@ -67,8 +67,8 @@ def load_value():
     this.font_size.insert(0,font_size)
 
 def prefs_changed(cmdr,is_beta) :
-    config.set("ep_LTD", this.ltd.get())
-    config.set("ep_Painite", this.painite.get())
+    config.set("ep_LTD", this.ltd_p.get())
+    config.set("ep_Painite", this.painite_p.get())
     config.set("LTD_t", this.ltd_threshold.get())
     config.set("Painite_t",this.painite_threshold.get())
     config.set("server_ip",this.server_ip.get())
@@ -92,11 +92,11 @@ def plugin_start(plugin_dir):
     ip = config.get("server_ip") or "127.0.0.1"
     port = config.get("server_port") or 44988
 
-    if config.get("ep_LTD") :
+    if config.get("ep_LTD") != None and config.get("ep_LTD") :
         ltd = config.get("LTD_t") or 18
     else :
         ltd = 99
-    if config.get("ep_Painite") :
+    if config.get("ep_Painite") != None and config.get("ep_Painite") :
         painite = config.get("Painite_t") or 25
     else :
         painite = 99
