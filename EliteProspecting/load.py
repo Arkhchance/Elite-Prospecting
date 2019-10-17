@@ -18,7 +18,8 @@ def plugin_prefs(parent,cmdr,is_beta):
 
     frame = nb.Frame(parent)
     frame.columnconfigure(1, weight=1)
-
+    nb.Label(frame,text="Set your value and restart EDMC").grid()
+    
     this.ltd = tk.IntVar(value=config.getint("ep_LTD"))
     this.painite = tk.IntVar(value=config.getint("ep_Painite"))
 
@@ -36,7 +37,6 @@ def plugin_prefs(parent,cmdr,is_beta):
 
     nb.Label(frame).grid(sticky=tk.W) # big spacer
 
-    nb.Label(frame,text="Set your value and restart EDMC").grid()
     nb.Checkbutton(frame, text='Search for LTD greater than', variable=this.ltd).grid(row=9, column=0, padx=PADX, pady=PADY, sticky=tk.EW)
     this.ltd_threshold = nb.Entry(frame)
     this.ltd_threshold.grid(row=9, column=1, padx=PADX, pady=PADY, sticky=tk.EW)
@@ -107,7 +107,11 @@ class Client():
         self.thread = None
 
     def start(self):
-        self.sock.connect((self.host , self.port))
+        try :
+            self.sock.connect((self.host , self.port))
+        except:
+            print("Error connecting")
+            return
         self.sendMsg("New PLayer")
         message = self.recvMsg()
         self.thread  = threading.Thread(target=self.recvs)
