@@ -35,6 +35,11 @@ def plugin_prefs(parent,cmdr,is_beta):
     this.server_port = nb.Entry(frame)
     this.server_port.grid(row=4, column=1, padx=PADX, pady=PADY, sticky=tk.EW)
 
+    this.font_size_label = nb.Label(frame,text="Server Port")
+    this.font_size_label.grid(row=5, padx=PADX, sticky=tk.W)
+    this.font_size = nb.Entry(frame)
+    this.font_size.grid(row=5, column=1, padx=PADX, pady=PADY, sticky=tk.EW)
+
     nb.Label(frame).grid(sticky=tk.W) # big spacer
 
     nb.Checkbutton(frame, text='Search for LTD greater than', variable=this.ltd).grid(row=9, column=0, padx=PADX, pady=PADY, sticky=tk.EW)
@@ -53,11 +58,13 @@ def load_value():
     port = config.get("server_port") or 44988
     ip = config.get("server_ip") or "127.0.0.1"
     painite_t = config.get("Painite_t") or 25
+    font_size = config.get("font_size") or 14
 
     this.ltd_threshold.insert(0,ltd_t)
     this.server_port.insert(0,port)
     this.server_ip.insert(0,ip)
     this.painite_threshold.insert(0,painite_t)
+    this.font_size.insert(0,font_size)
 
 def prefs_changed(cmdr,is_beta) :
     config.set("ep_LTD", this.ltd.get())
@@ -66,12 +73,15 @@ def prefs_changed(cmdr,is_beta) :
     config.set("Painite_t",this.painite_threshold.get())
     config.set("server_ip",this.server_ip.get())
     config.set("server_port",this.server_port.get())
+    config.set("font_size",this.font_size.get())
 
 def plugin_start3(plugin_dir):
     return plugin_start()
 
 def plugin_app(parent):
-    this.status = tk.Label(parent, text="", foreground="yellow")    # Override theme's foreground
+    this.status = tk.Label(parent, text="", foreground="yellow")
+    size = int(config.get("font_size")) or 14
+    this.status.config(font=("Courier", size))   # Override theme's foreground
     return (this.status)
 
 def plugin_start(plugin_dir):
@@ -90,8 +100,6 @@ def plugin_start(plugin_dir):
         painite = config.get("Painite_t") or 25
     else :
         painite = 99
-
-
 
     client = Client(ip, port)
     client.start()
@@ -117,12 +125,16 @@ def plugin_stop():
 def add_text(text):
     add_text.counter += 1
     if add_text.counter > 5 :
-        this.status["text"] = ""
+        try:
+            this.status["text"] = text +"\n"
+        except:
+            print("widget not init yet")
         add_text.counter = 0
-    try:
-        this.status["text"] += text +"\n"
-    except:
-        print("widget not init yet")
+    else :
+        try:
+            this.status["text"] += text +"\n"
+        except:
+            print("widget not init yet")
 add_text.counter = 0
 
 class Client():
