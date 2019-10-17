@@ -4,7 +4,9 @@ import time
 import glob
 import os
 import json
-from king_chat import Client
+import socket , sys , signal
+from Node import Node
+from threading import Thread
 
 #username
 name = "Arkhchance"
@@ -22,11 +24,41 @@ lookFor = "LowTemperatureDiamond"
 threshold = 18
 
 #serveraddr
-#ip = "127.0.0.1"
+ip = "127.0.0.1"
 
 #port
-#port = "44987"
+port = "44987"
 
+class Client(Node):
+
+	def __init__(self , host , port ,usename):
+		self.host = host
+		self.port = port
+        self.username = username
+		self.sock = socket.socket(socket.AF_INET , socket.SOCK_STREAM)
+
+	def start(self):
+		self.sock.connect((self.host , self.port))
+		self.sendMsg(self.sock ,"hello")
+		message = self.recvMsg(self.sock , '\n')
+		if message.replace('\n' , '')!='~q':
+			Thread(target=self.recvs , args=('\n',)).start()
+		else:
+			sys.exit(0)
+
+	def sends(self,msg):
+        message = self.username + " : " + msg
+		self.sendMsg(self.sock , message)
+
+	def recvs(self , delimeter):
+		while True:
+			msg = self.recvMsg(self.sock , delimeter)
+			if msg.replace('\n' , '')=='~q':
+				# self.sock.shutdown(socket.SHUT_RD)
+				self.sock.close()
+				break
+			msg =  msg.replace('\n' , '')
+			print(msg)
 
 def taifFile(logfile,client):
     for line in tailhead.follow_path(logfile):
@@ -42,19 +74,16 @@ def taifFile(logfile,client):
 
 def main():
     #setup file
-    fileList = glob.glob(path + "*.log")
-    latestFile = max(fileList,key=os.path.getctime)
+    #fileList = glob.glob(path + "*.log")
+    #latestFile = max(fileList,key=os.path.getctime)
 
-    client = Client(name="Arkhchance", ip="arkhchance.ovh", port=44987)
-    @client.on_received
-    def on_received(protocol, text):
-        print(text)
-
-    client.start(wait=False)
-    time.sleep(3)
-    client.send("test")
-    print(latestFile)
-    taifFile(latestFile,client)
+    client = Client(ip, port, name)
+    client.start()
+    while 1:
+        client.sends("test")
+        time.sleep(3)
+    #print(latestFile)
+    #taifFile(latestFile,client)
 
 
 if __name__ == "__main__":
