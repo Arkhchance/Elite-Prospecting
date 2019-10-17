@@ -138,6 +138,7 @@ class Client():
         threading.Thread(target=self.recvs).start()
 
     def stop(self):
+        print("quitting")
         self.sendMsg("quit")
 
     def sendMsg(self  , message):
@@ -154,8 +155,5 @@ class Client():
     def recvs(self):
         while True:
             msg = self.recvMsg()
-            if msg.find("quit") :
-                print("closing")
-                self.sock.close()
-                return
             print(msg)
+            print(msg.find("quit"))

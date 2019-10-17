@@ -18,7 +18,7 @@ def clientthread(conn):
         #Receiving from client
         data = conn.recv(1024)
         print("recv : ", data.decode())
-        if data.decode().find("quit") :
+        if data.decode().find("quit") != -1  :
             print("Player left")
             conn.sendall(data)
             conn.close()
