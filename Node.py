@@ -1,7 +1,7 @@
 class Node(object):
 
 	def sendMsg(self , sock , message):
-		sock.sendall(message)
+		sock.sendall(message.encode())
 
 	def recvMsg(self, sock , delimeter):
 		message = ""

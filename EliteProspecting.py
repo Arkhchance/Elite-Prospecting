@@ -24,7 +24,7 @@ lookFor = "LowTemperatureDiamond"
 threshold = 18
 
 #serveraddr
-ip = "127.0.0.1"
+ip = "37.59.36.212"
 
 #port
 port = 44987
@@ -79,8 +79,9 @@ def main():
 
     client = Client(ip, port, name)
     client.start()
+    msg = "test"
     while 1:
-        client.sends("test")
+        client.sends(msg)
         time.sleep(3)
     #print(latestFile)
     #taifFile(latestFile,client)
