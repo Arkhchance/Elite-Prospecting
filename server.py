@@ -9,7 +9,7 @@ import socket, select
 def broadcast_data (sock, message):
 	#Do not send the message to master socket and the client who has send us the message
 	for socket in CONNECTION_LIST:
-		if socket != server_socket and socket != sock :
+		if socket != server_socket :
 			try :
 				socket.sendall(message.encode())
 			except :
