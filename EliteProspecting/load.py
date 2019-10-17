@@ -89,8 +89,8 @@ def plugin_start(plugin_dir):
     global ltd
     global painite
 
-    ip = str(config.get("server_ip")) or "127.0.0.1"
-    port = int(config.get("server_port")) or 44988
+    ip = config.get("server_ip") or "127.0.0.1"
+    port = config.get("server_port") or 44988
 
     if config.get("ep_LTD") :
         ltd = config.get("LTD_t") or 18
@@ -101,11 +101,11 @@ def plugin_start(plugin_dir):
     else :
         painite = 99
 
-    client = Client(ip, port)
+    client = Client(str(ip), int(port))
     client.start()
 
 def journal_entry(cmdr,is_beta,system,station,entry,state):
-    global client
+    global cient
     global painite
     global ltd
     if entry['event'] == "ProspectedAsteroid":
