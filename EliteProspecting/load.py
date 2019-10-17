@@ -19,7 +19,7 @@ def plugin_prefs(parent,cmdr,is_beta):
     frame = nb.Frame(parent)
     frame.columnconfigure(1, weight=1)
     nb.Label(frame,text="Set your value and restart EDMC").grid()
-    
+
     this.ltd = tk.IntVar(value=config.getint("ep_LTD"))
     this.painite = tk.IntVar(value=config.getint("ep_Painite"))
 
@@ -45,10 +45,6 @@ def plugin_prefs(parent,cmdr,is_beta):
     this.painite_threshold = nb.Entry(frame)
     this.painite_threshold.grid(row=10, column=1, padx=PADX, pady=PADY, sticky=tk.EW)
 
-
-
-
-
     load_value()
     return frame
 
@@ -67,6 +63,7 @@ def prefs_changed(cmdr,is_beta) :
     config.set("ep_LTD", this.ltd.get())
     config.set("ep_Painite", this.painite.get())
     config.set("LTD_t", this.ltd_threshold.get())
+    config.set("Painite_t",this.painite_threshold.get())
     config.set("server_ip",this.server_ip.get())
     config.set("server_port",this.server_port.get())
 
@@ -75,9 +72,22 @@ def plugin_start3(plugin_dir):
 
 def plugin_start(plugin_dir):
     global client
+    global ltd
+    global painite
 
-    ip = config.get("server_ip") or "37.59.36.212"
-    port = config.get("server_port") or 44988
+    ip = str(config.get("server_ip")) or "127.0.0.1"
+    port = int(config.get("server_port")) or 44988
+
+    if config.get("ep_LTD") :
+        ltd = config.get("LTD_t") or 18
+    else :
+        ltd = 99
+    if config.get("ep_Painite") :
+        painite = config.get("Painite_t") or 25
+    else :
+        painite = 99
+
+
 
     client = Client(ip, port)
     client.start()
@@ -85,12 +95,19 @@ def plugin_start(plugin_dir):
 
 def journal_entry(cmdr,is_beta,system,station,entry,state):
     global client
+    global painite
+    global ltd
     if entry['event'] == "ProspectedAsteroid":
+        print(ltd," ",painite)
         for i in entry['Materials']:
-            if i['Name'] == lookFor and i['Proportion'] > threshold :
+            print(i['Name'])
+            print(i['Proportion'])
+            if i['Name'] == "LowTemperatureDiamond" and i['Proportion'] > float(ltd) :
                 msg = i['Name_Localised'] + " {:.2f}  %"
                 client.sends(cmdr,msg.format(i['Proportion']))
-
+            elif i['Name'] == "Painite" and i['Proportion'] > float(painite) :
+                msg = i['Name_Localised'] + " {:.2f}  %"
+                client.sends(cmdr,msg.format(i['Proportion']))
 
 
 def plugin_stop():
@@ -108,14 +125,17 @@ class Client():
 
     def start(self):
         try :
+            print("connecting to ",self.host)
             self.sock.connect((self.host , self.port))
-        except:
+
+        except socket.error, exc:
+            print("Caught exception socket.error : %s" % exc)
             print("Error connecting")
             return
+
         self.sendMsg("New PLayer")
         message = self.recvMsg()
-        self.thread  = threading.Thread(target=self.recvs)
-        self.thread.start()
+        threading.Thread(target=self.recvs).start()
 
     def stop(self):
         self.sendMsg("quit")
@@ -135,6 +155,7 @@ class Client():
         while True:
             msg = self.recvMsg()
             if msg.find("quit") :
+                print("closing")
                 self.sock.close()
                 return
             print(msg)
