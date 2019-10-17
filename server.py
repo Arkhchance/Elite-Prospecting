@@ -1,22 +1,19 @@
 #!/usr/bin/python
-import socket
+from king_chat import Server
 
+#listen_ip
+ip = "127.0.0.1"
+#listen_port
+port = 44987
 
 def main():
-    s = socket.socket()
-    host = socket.gethostname()
-    port = 54879
-    s.bind((host, port))
-    s.listen(5) 
+    server = Server(ip, port)
 
-    while True:
-       c, addr = s.accept()
-       print 'Got connection from', addr
-       c.send('Thank you for connecting')
-       c.close()
+    @server.on_received
+    def handle(protocol, text):
+        protocol.send_to_all_except_sender(text)
 
-
-
+    server.start(wait=True)
 
 if __name__ == "__main__":
     main()
