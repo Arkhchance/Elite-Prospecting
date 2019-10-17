@@ -70,6 +70,10 @@ def prefs_changed(cmdr,is_beta) :
 def plugin_start3(plugin_dir):
     return plugin_start()
 
+def plugin_app(parent):
+    this.status = tk.Label(parent, text="", foreground="yellow")    # Override theme's foreground
+    return (this.status)
+
 def plugin_start(plugin_dir):
     global client
     global ltd
@@ -97,14 +101,12 @@ def journal_entry(cmdr,is_beta,system,station,entry,state):
     global painite
     global ltd
     if entry['event'] == "ProspectedAsteroid":
-        this.status["text"] = "Happy!"
-        this.status["foreground"] = "green"
         for i in entry['Materials']:
             if i['Name'] == "LowTemperatureDiamond" and i['Proportion'] > float(ltd) :
-                msg = i['Name_Localised'] + " {:.2f}  %"
+                msg = i['Name_Localised'] + " {:.2f}%"
                 client.sends(cmdr,msg.format(i['Proportion']))
             elif i['Name'] == "Painite" and i['Proportion'] > float(painite) :
-                msg = i['Name_Localised'] + " {:.2f}  %"
+                msg = i['Name_Localised'] + " {:.2f}%"
                 client.sends(cmdr,msg.format(i['Proportion']))
 
 
@@ -112,6 +114,16 @@ def plugin_stop():
     global client
     client.stop()
 
+def add_text(text):
+    add_text.counter += 1
+    if add_text.counter > 5 :
+        this.status["text"] = ""
+        add_text.counter = 0
+    try:
+        this.status["text"] += text +"\n"
+    except:
+        print("widget not init yet")
+add_text.counter = 0
 
 class Client():
 
@@ -153,6 +165,7 @@ class Client():
         while True:
             msg = self.recvMsg()
             print(msg)
+            add_text(msg)
             if msg.find("quit") != -1 :
                 print("closing")
                 self.sock.close()
