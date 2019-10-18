@@ -53,7 +53,7 @@ class Prospecting():
             self.win_y.set(100)
 
             self.window = tk.Toplevel()
-            self.window.attributes("-alpha", 0.1)
+            self.window.attributes("-alpha", 0.5)
             self.window.wm_attributes("-topmost", True)
             self.window.overrideredirect(True)
             self.window.wm_geometry('+' + str(439) + '+' + str(172))
