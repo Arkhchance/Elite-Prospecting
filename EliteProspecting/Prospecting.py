@@ -109,7 +109,7 @@ class Prospecting():
             try:
                 msg = self.recvMsg()
                 if msg.decode() == "quit":
-                    break 
+                    break
                 self.display_msg(msg)
             except socket.error, exc:
                 print("error receiving")
