@@ -19,6 +19,7 @@ def plugin_prefs(parent,cmdr,is_beta):
 
     this.ltd_p = tk.IntVar(value=config.getint("track_LTD") and 1)
     this.painite_p = tk.IntVar(value=config.getint("track_Painite") and 1)
+    this.new_win = tk.IntVar(value=config.getint("use_new_window") and 1)
 
     this.ip_label = nb.Label(frame,text="Server IP")
     this.ip_label.grid(row=3, padx=PADX, sticky=tk.W)
@@ -35,7 +36,7 @@ def plugin_prefs(parent,cmdr,is_beta):
     this.font_size = nb.Entry(frame)
     this.font_size.grid(row=5, column=1, padx=PADX, pady=PADY, sticky=tk.EW)
 
-    nb.Label(frame).grid(sticky=tk.W) # big spacer
+    nb.Checkbutton(frame, text='Display result on new window', variable=this.new_win).grid(row=6, column=0, padx=PADX, pady=PADY, sticky=tk.EW)
 
     nb.Checkbutton(frame, text='Search for LTD greater than', variable=this.ltd_p).grid(row=9, column=0, padx=PADX, pady=PADY, sticky=tk.EW)
     this.ltd_threshold = nb.Entry(frame)
@@ -71,7 +72,7 @@ def prefs_changed(cmdr,is_beta) :
     config.set("server_ip",this.server_ip.get())
     config.set("server_port",this.server_port.get())
     config.set("font_size",this.font_size.get())
-
+    config.set("use_new_window",this.new_win.get())
     prospecting.load_config()
 
 def plugin_start3(plugin_dir):
@@ -81,11 +82,9 @@ def plugin_app(parent):
     global prospecting
     prospecting.init_gui(parent)
 
-
 def plugin_start(plugin_dir):
     global prospecting
     prospecting = Prospecting()
-
 
 def journal_entry(cmdr,is_beta,system,station,entry,state):
     global prospecting

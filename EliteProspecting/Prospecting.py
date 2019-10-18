@@ -20,29 +20,51 @@ class Prospecting():
         self.ip = config.get("server_ip") or "127.0.0.1"
         self.port = config.get("server_port") or 44988
 
-        self.track_LTD = config.getint("track_LTD") or True
-        self.track_Painite = config.getint("track_Painite") or True
+        self.track_LTD = config.getint("track_LTD") or 1
+        self.track_Painite = config.getint("track_Painite") or 1
+        self.new_win = config.getint("use_new_window") or 0
 
         self.ltd_threshold = config.get("LTD_t") or 18
         self.painite_threshold = config.get("Painite_t") or 25
-
         self.font_size = config.get("font_size") or 14
+        print("new win ", self.new_win)
+        print("ltd ", self.track_LTD)
 
     def init_gui(self,parent):
-        print("call init")
         self.parent = parent
         self.frame = tk.Frame(parent, borderwidth=2)
         self.frame.grid(sticky=tk.NSEW, columnspan=2)
 
-        self.connection = tk.Button(self.frame, text="Connect to server", command=self.connect)
         row = 0
+        self.connection = tk.Button(self.frame, text="Connect to server", command=self.connect)
         self.connection.grid(row=row, columnspan=2)
+        if self.new_win == 0:
+            self.status = tk.Label(self.frame, text="", foreground="yellow")
+            self.status.config(font=("Courier", int(self.font_size)))
+            row += 1
+            self.status.grid(row=row, pady=5, sticky=tk.W)
+        else :
+            self.win_x = tk.Scale(self.frame, from_=1, to=4000, orient=tk.HORIZONTAL, label="x position",command=self.update_new_win)
+            self.win_x.grid(row=row+3, columnspan=2)
+            self.win_x.set(100)
+            row += 1
+            self.win_y = tk.Scale(self.frame, from_=1, to=2000, orient=tk.HORIZONTAL, label="y position",command=self.update_new_win)
+            self.win_y.grid(row=row+6, columnspan=2)
+            self.win_y.set(100)
 
-        self.status = tk.Label(self.frame, text="", foreground="yellow")
-        self.status.config(font=("Courier", int(self.font_size)))
-        row += 1
-        self.status.grid(row=row, pady=5, sticky=tk.W)
+            self.window = tk.Toplevel()
+            self.window.attributes("-alpha", 0.1)
+            self.window.wm_attributes("-topmost", True)
+            self.window.overrideredirect(True)
+            self.window.wm_geometry('+' + str(439) + '+' + str(172))
+            self.status = tk.Label(self.window, text="This is a test",foreground="yellow")
+            self.status.config(font=("Courier", int(self.font_size)))
+            self.status.pack(side="top", fill="both", expand=True, padx=10, pady=10)
+
         return self.frame
+
+    def update_new_win(self,val):
+        self.window.wm_geometry('+' + str(self.win_x.get()) + '+' + str(self.win_y.get()))
 
     def display_msg(self,msg):
         msg = msg + "\n"
@@ -126,9 +148,9 @@ class Prospecting():
         #received a ProspectedAsteroid event
         #check for materials
         for mat in entry['Materials']:
-            if mat['Name'] == "LowTemperatureDiamond" and self.track_LTD :
+            if mat['Name'] == "LowTemperatureDiamond" and self.track_LTD == 1 :
                 if mat['Proportion'] > float(self.ltd_threshold):
                     self.publish(cmdr,mat['Name_Localised'],mat['Proportion'])
-            elif mat['Name'] == "Painite" and self.track_Painite :
+            elif mat['Name'] == "Painite" and self.track_Painite == 1 :
                 if mat['Proportion'] > float(self.painite_threshold):
                     self.publish(cmdr,mat['Name_Localised'],mat['Proportion'])
