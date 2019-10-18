@@ -13,7 +13,7 @@ class Prospecting():
         self.total_msg  = 0
         self.messages = deque()
         self.buffer = 1024
-        self.sock = socket.socket(socket.AF_INET , socket.SOCK_STREAM)
+        self.sock = socket.socket(socket.AF_INET , socket.SOCK6_STREAM)
         self.load_config()
         print(sys.version)
 
@@ -45,11 +45,11 @@ class Prospecting():
             row += 1
             self.status.grid(row=row, pady=5, sticky=tk.W)
         else :
-            self.win_x = tk.Scale(self.frame, from_=1, to=4000, orient=tk.HORIZONTAL, label="x position",command=self.update_new_win)
+            self.win_x = tk.Scale(self.frame, from_=1, to=6000, orient=tk.HORIZONTAL, label="x position",command=self.update_new_win)
             self.win_x.grid(row=row+3, columnspan=2)
             self.win_x.set(100)
             row += 1
-            self.win_y = tk.Scale(self.frame, from_=1, to=2000, orient=tk.HORIZONTAL, label="y position",command=self.update_new_win)
+            self.win_y = tk.Scale(self.frame, from_=1, to=3000, orient=tk.HORIZONTAL, label="y position",command=self.update_new_win)
             self.win_y.grid(row=row+6, columnspan=2)
             self.win_y.set(100)
 
