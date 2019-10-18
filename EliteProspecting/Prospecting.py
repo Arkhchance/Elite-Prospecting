@@ -90,7 +90,7 @@ class Prospecting():
 
     def stop(self):
         if not self.connected:
-            return 
+            return
         self.run = False
         self.connected = False
         self.sendMsg("quit")
@@ -108,7 +108,8 @@ class Prospecting():
         while self.run:
             try:
                 msg = self.recvMsg()
-                print(msg)
+                if msg.decode() == "quit":
+                    break 
                 self.display_msg(msg)
             except socket.error, exc:
                 print("error receiving")
