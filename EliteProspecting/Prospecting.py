@@ -53,12 +53,13 @@ class Prospecting():
             self.win_y.set(100)
 
             self.window = tk.Toplevel()
-            self.window.attributes("-alpha", 0.75)
+            self.window.attributes("-transparentcolor", 'black')
             self.window.wm_attributes("-topmost", True)
             self.window.overrideredirect(True)
             self.window.wm_geometry('+' + str(439) + '+' + str(172))
+            self.window.configure(background='black')
             self.status = tk.Label(self.window, text="Waiting..",foreground="yellow")
-            self.status.config(font=("Courier", int(self.font_size)))
+            self.status.config(font=("Courier", int(self.font_size)),background='black')
             self.status.pack(side="top", fill="both", expand=True, padx=10, pady=10)
 
         return self.frame
