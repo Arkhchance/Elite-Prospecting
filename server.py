@@ -39,8 +39,9 @@ class ThreadClient(threading.Thread):
 
             #if client send QUIT => terminate the conenction
             if msgClient.decode() == "quit" :
+                quit = "quit"
                 print("client exitting")
-                conn_client[nom].send("quit")
+                conn_client[nom].send(quit.encode())
                 break
 
             message = msgClient.decode()
