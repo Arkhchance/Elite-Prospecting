@@ -76,7 +76,7 @@ def prefs_changed(cmdr,is_beta) :
     prospecting.load_config()
 
 def plugin_start3(plugin_dir):
-    return plugin_start()
+    return plugin_start(plugin_dir)
 
 def plugin_app(parent):
     global prospecting

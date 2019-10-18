@@ -4,7 +4,6 @@ import socket , sys , time
 import threading
 from config import config
 from collections import deque
-from ui import new_ui
 
 class Prospecting():
     def __init__(self):
@@ -63,7 +62,6 @@ class Prospecting():
             self.status.config(font=("Courier", int(self.font_size)))
             self.status.pack(side="top", fill="both", expand=True, padx=10, pady=10)
 
-        i = new_ui()
         return self.frame
 
     def update_new_win(self,val):
