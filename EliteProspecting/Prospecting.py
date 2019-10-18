@@ -90,9 +90,9 @@ class Prospecting():
     def sendMsg(self,message):
         try :
             self.sock.sendall(message.encode())
-        except socket.error, exc:
+        except socket.error as e:
             print("error sending")
-            print("Caught exception socket.error : %s" % exc)
+            print("Caught exception socket.error : %s" % e)
 
     def connect(self):
         try :
@@ -100,8 +100,8 @@ class Prospecting():
             print("connecting to ",self.ip)
             self.sock.connect((self.ip , int(self.port)))
 
-        except socket.error, exc:
-            print("Caught exception socket.error : %s" % exc)
+        except socket.error as e:
+            print("Caught exception socket.error : %s" % e)
             print("Error connecting")
             self.connection["text"] = "Error connecting check configuration"
             return
@@ -122,8 +122,8 @@ class Prospecting():
         time.sleep(1)
         try:
             self.sock.close()
-        except socket.error, exc:
-            print("socket.error : %s" % exc)
+        except socket.error as e:
+            print("socket.error : %s" % e)
 
     def recvMsg(self):
         data = self.sock.recv(self.buffer)
@@ -136,9 +136,9 @@ class Prospecting():
                 if msg.decode() == "quit":
                     break
                 self.display_msg(msg)
-            except socket.error, exc:
+            except socket.error as e:
                 print("error receiving")
-                print("Caught exception socket.error : %s" % exc)
+                print("Caught exception socket.error : %s" % e)
 
     def publish(self,cmdr,name,prop):
         message = cmdr + " " + name + " {:.2f}%"
