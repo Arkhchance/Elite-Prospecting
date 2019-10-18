@@ -126,9 +126,9 @@ class Prospecting():
         #received a ProspectedAsteroid event
         #check for materials
         for mat in entry['Materials']:
-            if i['Name'] == "LowTemperatureDiamond" and self.track_LTD :
+            if mat['Name'] == "LowTemperatureDiamond" and self.track_LTD :
                 if mat['Proportion'] > float(self.ltd_threshold):
                     self.publish(cmdr,mat['Name_Localised'],mat['Proportion'])
-            elif i['Name'] == "Painite" and self.track_Painite :
+            elif mat['Name'] == "Painite" and self.track_Painite :
                 if mat['Proportion'] > float(self.painite_threshold):
                     self.publish(cmdr,mat['Name_Localised'],mat['Proportion'])

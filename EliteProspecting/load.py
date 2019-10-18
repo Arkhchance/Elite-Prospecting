@@ -1,9 +1,11 @@
 #!/usr/bin/python
+import sys
 import Tkinter as tk
 import myNotebook as nb
 from config import config
 from Prospecting import Prospecting
 
+this = sys.modules[__name__]
 prospecting = None
 
 def plugin_prefs(parent,cmdr,is_beta):
