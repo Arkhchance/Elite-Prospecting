@@ -15,12 +15,14 @@ def receiveSignal(signalNumber, frame):
     print('Received Signal ', signalNumber)
     print("exiting..")
     run = False
+    msg = "quit"
     time.sleep(2)
     for con in conn_client:
         try:
+            conn_client[con].send(msg.encode())
             conn_client[con].close()
         except socket.error as e:
-            print("error sending ",str(e))
+            print("error closing ",str(e))
     sys.exit()
     return
 
@@ -36,17 +38,20 @@ class ThreadClient(threading.Thread):
             msgClient = self.connexion.recv(BUFFER)
 
             #if client send QUIT => terminate the conenction
-            if msgClient.decode().upper() == "QUIT" :
+            if msgClient.decode() == "quit" :
+                print("client exitting")
+                conn_client[nom].send("quit")
                 break
 
             message = msgClient.decode()
             print("received ", message)
             # send to all client :
             for cle in conn_client:
-                try:
-                    conn_client[cle].send(message.encode())
-                except socket.error as e:
-                    print("error sending ",str(e))
+                if cle != nom : #don't send to ourself
+                    try:
+                        conn_client[cle].send(message.encode())
+                    except socket.error as e:
+                        print("error sending ",str(e))
 
         # close connection :
         self.connexion.close()

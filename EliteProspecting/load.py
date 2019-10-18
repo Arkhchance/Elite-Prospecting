@@ -1,15 +1,10 @@
 #!/usr/bin/python
-import socket , sys , signal
-import threading
 import Tkinter as tk
 import myNotebook as nb
 from config import config
+from Prospecting import Prospecting
 
-client = None
-ltd = None
-painite = None
-
-this = sys.modules[__name__]
+prospecting = None
 
 def plugin_prefs(parent,cmdr,is_beta):
     PADX = 10
@@ -18,10 +13,10 @@ def plugin_prefs(parent,cmdr,is_beta):
 
     frame = nb.Frame(parent)
     frame.columnconfigure(1, weight=1)
-    nb.Label(frame,text="Set your value and restart EDMC").grid()
+    nb.Label(frame,text="Configuration").grid()
 
-    this.ltd_p = tk.IntVar(value=config.getint("oLTD") and 1)
-    this.painite_p = tk.IntVar(value=config.getint("iPainite") and 1)
+    this.ltd_p = tk.IntVar(value=config.getint("track_LTD") and 1)
+    this.painite_p = tk.IntVar(value=config.getint("track_Painite") and 1)
 
     this.ip_label = nb.Label(frame,text="Server IP")
     this.ip_label.grid(row=3, padx=PADX, sticky=tk.W)
@@ -65,118 +60,36 @@ def load_value():
     this.font_size.insert(0,font_size)
 
 def prefs_changed(cmdr,is_beta) :
-    print("val ", this.ltd_p.get())
-    config.set("oLTD", this.ltd_p.get())
-    config.set("iPainite", this.painite_p.get())
+    global prospecting
+
+    config.set("track_LTD", this.ltd_p.get())
+    config.set("track_Painite", this.painite_p.get())
     config.set("LTD_t", this.ltd_threshold.get())
     config.set("Painite_t",this.painite_threshold.get())
     config.set("server_ip",this.server_ip.get())
     config.set("server_port",this.server_port.get())
     config.set("font_size",this.font_size.get())
 
+    prospecting.load_config()
+
 def plugin_start3(plugin_dir):
     return plugin_start()
 
 def plugin_app(parent):
-    this.status = tk.Label(parent, text="", foreground="yellow")
-    size = config.get("font_size") or 14
-    this.status.config(font=("Courier", int(size)))   # Override theme's foreground
-    return (this.status)
+    global prospecting
+    prospecting.init_gui(parent)
+
 
 def plugin_start(plugin_dir):
-    global client
-    global ltd
-    global painite
+    global prospecting
+    prospecting = Prospecting()
 
-    ip = config.get("server_ip") or "127.0.0.1"
-    port = config.get("server_port") or 44988
-
-
-    if config.getint("oLTD") != None and config.getint("oLTD") :
-        ltd = config.get("LTD_t") or 18
-    else :
-        ltd = 99
-    if config.getint("iPainite") != None and config.getint("iPainite") :
-        painite = config.get("Painite_t") or 25
-    else :
-        painite = 99
-
-    client = Client(str(ip), int(port))
-    client.start()
 
 def journal_entry(cmdr,is_beta,system,station,entry,state):
-    global cient
-    global painite
-    global ltd
+    global prospecting
     if entry['event'] == "ProspectedAsteroid":
-        for i in entry['Materials']:
-            if i['Name'] == "LowTemperatureDiamond" and i['Proportion'] > float(ltd) :
-                msg = i['Name_Localised'] + " {:.2f}%"
-                client.sends(cmdr,msg.format(i['Proportion']))
-            elif i['Name'] == "Painite" and i['Proportion'] > float(painite) :
-                msg = i['Name_Localised'] + " {:.2f}%"
-                client.sends(cmdr,msg.format(i['Proportion']))
-
+        prospecting.event(cmdr,entry)
 
 def plugin_stop():
-    global client
-    client.stop()
-
-def add_text(text):
-    add_text.counter += 1
-    if add_text.counter > 5 :
-        try:
-            this.status["text"] = text +"\n"
-        except:
-            print("widget not init yet")
-        add_text.counter = 0
-    else :
-        try:
-            this.status["text"] += text +"\n"
-        except:
-            print("widget not init yet")
-add_text.counter = 0
-
-class Client():
-
-    def __init__(self , host , port):
-        self.host = host
-        self.port = port
-        self.sock = socket.socket(socket.AF_INET , socket.SOCK_STREAM)
-        self.thread = None
-        self.run = True
-
-    def start(self):
-        try :
-            print("connecting to ",self.host)
-            self.sock.connect((self.host , self.port))
-
-        except socket.error, exc:
-            print("Caught exception socket.error : %s" % exc)
-            print("Error connecting")
-            return
-
-        self.sendMsg("New Player")
-        message = self.recvMsg()
-        threading.Thread(target=self.recvs).start()
-
-    def stop(self):
-        self.run = False
-        self.sendMsg("quit")
-
-    def sendMsg(self  , message):
-        self.sock.sendall(message.encode())
-
-    def recvMsg(self):
-        data = self.sock.recv(4096)
-        return data.decode()
-
-    def sends(self,cmdr, msg):
-        message = cmdr + " : " + msg
-        self.sendMsg(message)
-
-    def recvs(self):
-        while self.run:
-            msg = self.recvMsg()
-            print(msg)
-            add_text(msg)
+    global prospecting
+    prospecting.stop()
