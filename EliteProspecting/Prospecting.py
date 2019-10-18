@@ -1,5 +1,5 @@
 #!/usr/bin/python
-import tkinter as tk
+import Tkinter as tk
 import socket , sys , time
 import threading
 from config import config

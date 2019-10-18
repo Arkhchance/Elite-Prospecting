@@ -1,6 +1,6 @@
 #!/usr/bin/python
 import sys
-import tkinter as tk
+import Tkinter as tk
 import myNotebook as nb
 from config import config
 from Prospecting import Prospecting
