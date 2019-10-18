@@ -3,7 +3,6 @@ import Tkinter as tk
 import socket , sys , time
 import threading
 from config import config
-from collections import deque
 
 class Prospecting():
     def __init__(self):
@@ -11,9 +10,9 @@ class Prospecting():
         self.run = True
         self.parent = None
         self.total_msg  = 0
-        self.messages = deque()
+        self.messages = []
         self.buffer = 1024
-        self.sock = socket.socket(socket.AF_INET , socket.SOCK6_STREAM)
+        self.sock = socket.socket(socket.AF_INET , socket.SOCK_STREAM)
         self.load_config()
         print(sys.version)
 
@@ -54,11 +53,11 @@ class Prospecting():
             self.win_y.set(100)
 
             self.window = tk.Toplevel()
-            self.window.attributes("-alpha", 0.5)
+            self.window.attributes("-alpha", 0.75)
             self.window.wm_attributes("-topmost", True)
             self.window.overrideredirect(True)
             self.window.wm_geometry('+' + str(439) + '+' + str(172))
-            self.status = tk.Label(self.window, text="This is a test",foreground="yellow")
+            self.status = tk.Label(self.window, text="Waiting..",foreground="yellow")
             self.status.config(font=("Courier", int(self.font_size)))
             self.status.pack(side="top", fill="both", expand=True, padx=10, pady=10)
 
@@ -72,13 +71,11 @@ class Prospecting():
         val = ""
         self.total_msg += 1
 
-        if self.total_msg >= 5 :
-            self.messages.remove(self.messages.popleft())
+        if self.total_msg >= 7 :
+            self.messages.pop(0)
             self.total_msg -= 1
-            self.messages.append(msg)
-            self.messages.rotate(1)
-        else :
-            self.messages.append(msg)
+
+        self.messages.append(msg)
 
         for text in self.messages :
             val += text
@@ -140,7 +137,7 @@ class Prospecting():
 
     def publish(self,cmdr,name,prop):
         message = cmdr + " " + name + " {:.2f}%"
-        message = mmessage.format(prop)
+        message = message.format(prop)
         if self.connected :
             self.sendMsg(message)
         self.display_msg(message)
