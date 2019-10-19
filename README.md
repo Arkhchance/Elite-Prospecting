@@ -5,7 +5,7 @@ Copy EliteProspecting inside EDMC plugin's folder
 Works in solo,
 you need to run server.py if you want it to work with multiple people
 
-Transparency only work on windows ¯\_(ツ)_/¯
+Transparency only work on windows ¯\\_(ツ)_/¯
 
 About colors :
 You can use a string specifying the proportion of red, green and blue in hexadecimal digits. For example, "#fff" is white, "#000000" is black, "#000fff000" is pure green, and "#00ffff" is pure cyan (green plus blue).
