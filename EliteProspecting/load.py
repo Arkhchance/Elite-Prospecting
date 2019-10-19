@@ -41,7 +41,7 @@ def plugin_prefs(parent,cmdr,is_beta):
     this.font_size.grid(row=row, column=1, padx=PADX, pady=PADY, sticky=tk.EW)
 
     row += 1
-    nb.Checkbutton(frame, text='Display result on new window (restart edmc)', variable=this.new_win).grid(row=row, column=0, padx=PADX, pady=PADY, sticky=tk.EW)
+    nb.Checkbutton(frame, text='Display result on new window (require restart)', variable=this.new_win).grid(row=row, column=0, padx=PADX, pady=PADY, sticky=tk.EW)
     row += 1
     nb.Checkbutton(frame, text='Make the window transparent (windows only)', variable=this.win_trans).grid(row=row, column=0, padx=PADX, pady=PADY, sticky=tk.EW)
     row += 1
