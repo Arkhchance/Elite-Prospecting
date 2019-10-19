@@ -196,13 +196,13 @@ class Prospecting():
             if mat['Name'] == "LowTemperatureDiamond" and self.track_LTD == 1 :
                 if mat['Proportion'] > float(self.ltd_threshold):
                     self.publish(cmdr,mat['Name_Localised'],mat['Proportion'])
-                elif :
+                else :
                     below_t = True
                     empty = False
             elif mat['Name'] == "Painite" and self.track_Painite == 1 :
                 if mat['Proportion'] > float(self.painite_threshold):
                     self.publish(cmdr,mat['Name_Localised'],mat['Proportion'])
-                elif 1 :
+                else :
                     below_t = True
                     empty = False
 
