@@ -5,6 +5,8 @@ Copy EliteProspecting inside EDMC plugin's folder
 Works in solo,
 you need to run server.py if you want it to work with multiple people
 
+Check the plugin's settings before running it
+
 Transparency only work on windows ¯\\\_(ツ)\_/¯
 
 About colors :
