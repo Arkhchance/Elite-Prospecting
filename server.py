@@ -61,15 +61,15 @@ class ThreadClient(threading.Thread):
                 # add to new one
                 session_list[session_name].append(nom)
                 cleanup()
-                continue 
+                continue
 
-            message = msgClient.decode()
-            print("received ", message)
+
+            print("received ", msg)
             # send to all client in session:
             for name in session_list[session_name]:
                 if name != nom : #don't send to ourself
                     try:
-                        conn_client[name].send(message.encode())
+                        conn_client[name].send(msg.encode())
                     except socket.error as e:
                         print("error sending ",str(e))
 
