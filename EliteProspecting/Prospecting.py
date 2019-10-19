@@ -189,17 +189,25 @@ class Prospecting():
 
     def event(self,cmdr,entry):
         #received a ProspectedAsteroid event
+        empty = True
+        below_t = False
         #check for materials
         for mat in entry['Materials']:
             if mat['Name'] == "LowTemperatureDiamond" and self.track_LTD == 1 :
                 if mat['Proportion'] > float(self.ltd_threshold):
                     self.publish(cmdr,mat['Name_Localised'],mat['Proportion'])
-                elif self.miss == 1 :
-                    self.display_msg("Asteroid below threshold",True)
+                elif :
+                    below_t = True
+                    empty = False
             elif mat['Name'] == "Painite" and self.track_Painite == 1 :
                 if mat['Proportion'] > float(self.painite_threshold):
                     self.publish(cmdr,mat['Name_Localised'],mat['Proportion'])
-                elif self.miss == 1 :
-                    self.display_msg("Asteroid below threshold",True)
-            elif self.miss == 1 :
-                self.display_msg("Wrong Asteroid",True)
+                elif 1 :
+                    below_t = True
+                    empty = False
+
+        if self.miss == 1 :
+            if empty and not below_t:
+                self.display_msg("Asteroid without materials",True)
+            if below_t :
+                self.display_msg("Threshold not met",True)
