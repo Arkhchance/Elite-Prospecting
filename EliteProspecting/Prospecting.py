@@ -19,7 +19,7 @@ class Prospecting():
         self.load_config()
         print(sys.version)
 
-    def load_config(self):
+    def load_config(self,change = False):
         self.ip = config.get("server_ip") or "127.0.0.1"
         self.port = config.get("server_port") or 44988
 
@@ -32,6 +32,12 @@ class Prospecting():
         self.ltd_threshold = config.get("LTD_t") or 18
         self.painite_threshold = config.get("Painite_t") or 25
         self.font_size = config.get("font_size") or 14
+
+        self.my_color = config.get("my_color") or "Red"
+        self.color = config.get("color") or "Yellow"
+
+        if change :
+            self.refresh_display()
 
     def init_gui(self,parent):
         self.parent = parent
@@ -57,28 +63,19 @@ class Prospecting():
             self.win_y.set(100)
 
             self.window = tk.Toplevel()
-<<<<<<< HEAD
             if sys.platform == 'win32' and self.win_trans == 1 :
                 self.window.attributes("-transparentcolor", 'black')
             self.window.attributes("-alpha", 0.75)
-=======
-            self.window.attributes("-transparentcolor", 'black')
->>>>>>> ff85084b49827928757dd2d19e91f0cc75227cb4
             self.window.wm_attributes("-topmost", True)
             self.window.overrideredirect(True)
             self.window.configure(background='black')
             self.window.wm_geometry('+' + str(439) + '+' + str(172))
-<<<<<<< HEAD
             for i in range(self.total_msg_display):
-                self.status[i] = tk.Label(self.window, text="Waiting..",foreground="red")
+                self.status[i] = tk.Label(self.window)
                 self.status[i].config(font=("Courier", int(self.font_size)),background='black')
                 self.status[i].pack(side="top", fill="both", expand=True, padx=10, pady=10)
-=======
-            self.window.configure(background='black')
-            self.status = tk.Label(self.window, text="Waiting..",foreground="yellow")
-            self.status.config(font=("Courier", int(self.font_size)),background='black')
-            self.status.pack(side="top", fill="both", expand=True, padx=10, pady=10)
->>>>>>> ff85084b49827928757dd2d19e91f0cc75227cb4
+                if i == 0 :
+                    self.status[i]['text'] = "Waiting..."
 
         return self.frame
 
@@ -89,9 +86,9 @@ class Prospecting():
         #msg = msg + "\n"
         #val = ""
         if mine :
-            color = "Yellow"
+            color = "mine"
         else :
-            color = "red"
+            color = "other"
 
         self.colors.append(color)
         self.messages.append(msg)
@@ -102,12 +99,17 @@ class Prospecting():
             self.colors.pop(0)
             self.total_msg -= 1
 
-        self.messages.append(msg)
+        self.refresh_display()
 
-        for text in self.messages :
-            val += text
+    def refresh_display(self):
+        for i in range(len(self.messages)):
+            if self.colors[i] == "mine":
+                color = self.my_color
+            else :
+                color = self.color
 
-        self.status['text'] = val
+            self.status[i].config(foreground=color)
+            self.status[i]['text'] = self.messages[i]
 
     def sendMsg(self,message):
         try :

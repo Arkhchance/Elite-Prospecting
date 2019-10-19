@@ -48,6 +48,17 @@ def plugin_prefs(parent,cmdr,is_beta):
     nb.Checkbutton(frame, text='Display message if asteroid target doesn\'t meet requirement', variable=this.miss).grid(row=row, column=0, padx=PADX, pady=PADY, sticky=tk.EW)
 
     row += 1
+    this.my_color_label = nb.Label(frame,text="My Color : ")
+    this.my_color_label.grid(row=row, padx=PADX, sticky=tk.W)
+    this.my_color = nb.Entry(frame)
+    this.my_color.grid(row=row, column=1, padx=PADX, pady=PADY, sticky=tk.EW)
+    row += 1
+    this.color_label = nb.Label(frame,text="Others Color : ")
+    this.color_label.grid(row=row, padx=PADX, sticky=tk.W)
+    this.color = nb.Entry(frame)
+    this.color.grid(row=row, column=1, padx=PADX, pady=PADY, sticky=tk.EW)
+
+    row += 1
     nb.Checkbutton(frame, text='Search for LTD greater than', variable=this.ltd_p).grid(row=row, column=0, padx=PADX, pady=PADY, sticky=tk.EW)
     this.ltd_threshold = nb.Entry(frame)
     this.ltd_threshold.grid(row=row, column=1, padx=PADX, pady=PADY, sticky=tk.EW)
@@ -66,12 +77,16 @@ def load_value():
     ip = config.get("server_ip") or "127.0.0.1"
     painite_t = config.get("Painite_t") or 25
     font_size = config.get("font_size") or 14
+    my_color = config.get("my_color") or "Red"
+    color = config.get("color") or "Yellow"
 
     this.ltd_threshold.insert(0,ltd_t)
     this.server_port.insert(0,port)
     this.server_ip.insert(0,ip)
     this.painite_threshold.insert(0,painite_t)
     this.font_size.insert(0,font_size)
+    this.my_color.insert(0,my_color)
+    this.color.insert(0,color)
 
 def prefs_changed(cmdr,is_beta) :
     global prospecting
@@ -86,8 +101,10 @@ def prefs_changed(cmdr,is_beta) :
     config.set("use_new_window",this.new_win.get())
     config.set("win_trans",this.win_trans.get())
     config.set("miss",this.miss.get())
-    print("set ",this.server_port.get())
-    prospecting.load_config()
+    config.set("my_color",this.my_color.get())
+    config.set("color",this.color.get())
+
+    prospecting.load_config(True)
 
 def plugin_start3(plugin_dir):
     return plugin_start(plugin_dir)
