@@ -61,6 +61,7 @@ class ThreadClient(threading.Thread):
                 # add to new one
                 session_list[session_name].append(nom)
                 cleanup()
+                continue 
 
             message = msgClient.decode()
             print("received ", message)
