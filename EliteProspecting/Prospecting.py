@@ -83,8 +83,6 @@ class Prospecting():
         self.window.wm_geometry('+' + str(self.win_x.get()) + '+' + str(self.win_y.get()))
 
     def display_msg(self,msg,mine=True):
-        #msg = msg + "\n"
-        #val = ""
         if mine :
             color = "mine"
         else :

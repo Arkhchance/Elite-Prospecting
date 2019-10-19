@@ -22,7 +22,7 @@ def plugin_prefs(parent,cmdr,is_beta):
     this.new_win = tk.IntVar(value=config.getint("use_new_window") and 0)
     this.win_trans = tk.IntVar(value=config.getint("win_trans") and 0)
     this.miss = tk.IntVar(value=config.getint("miss") and 0)
-0
+    
     this.ip_label = nb.Label(frame,text="Server IP")
     this.ip_label.grid(row=row, padx=PADX, sticky=tk.W)
     this.server_ip = nb.Entry(frame)
