@@ -17,12 +17,12 @@ def plugin_prefs(parent,cmdr,is_beta):
     frame.columnconfigure(1, weight=1)
 
 
-    this.ltd_p = tk.IntVar(value=config.getint("track_LTD") and 1)
-    this.painite_p = tk.IntVar(value=config.getint("track_Painite") and 1)
-    this.new_win = tk.IntVar(value=config.getint("use_new_window") and 1)
-    this.win_trans = tk.IntVar(value=config.getint("win_trans") and 1)
-    this.miss = tk.IntVar(value=config.getint("miss") and 1)
-
+    this.ltd_p = tk.IntVar(value=config.getint("track_LTD") and 0)
+    this.painite_p = tk.IntVar(value=config.getint("track_Painite") and 0)
+    this.new_win = tk.IntVar(value=config.getint("use_new_window") and 0)
+    this.win_trans = tk.IntVar(value=config.getint("win_trans") and 0)
+    this.miss = tk.IntVar(value=config.getint("miss") and 0)
+0
     this.ip_label = nb.Label(frame,text="Server IP")
     this.ip_label.grid(row=row, padx=PADX, sticky=tk.W)
     this.server_ip = nb.Entry(frame)

@@ -26,7 +26,7 @@ class Prospecting():
         self.track_LTD = config.getint("track_LTD")
         self.track_Painite = config.getint("track_Painite")
         self.new_win = config.getint("use_new_window")
-        self.win_trans = config.getint("font_size")
+        self.win_trans = config.getint("win_trans")
         self.miss = config.getint("miss")
 
         self.ltd_threshold = config.get("LTD_t") or 18
@@ -65,11 +65,11 @@ class Prospecting():
             self.window = tk.Toplevel()
             if sys.platform == 'win32' and self.win_trans == 1 :
                 self.window.attributes("-transparentcolor", 'black')
-            self.window.attributes("-alpha", 0.75)
             self.window.wm_attributes("-topmost", True)
             self.window.overrideredirect(True)
             self.window.configure(background='black')
             self.window.wm_geometry('+' + str(439) + '+' + str(172))
+
             for i in range(self.total_msg_display):
                 self.status[i] = tk.Label(self.window)
                 self.status[i].config(font=("Courier", int(self.font_size)),background='black')
