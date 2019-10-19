@@ -57,17 +57,28 @@ class Prospecting():
             self.win_y.set(100)
 
             self.window = tk.Toplevel()
+<<<<<<< HEAD
             if sys.platform == 'win32' and self.win_trans == 1 :
                 self.window.attributes("-transparentcolor", 'black')
             self.window.attributes("-alpha", 0.75)
+=======
+            self.window.attributes("-transparentcolor", 'black')
+>>>>>>> ff85084b49827928757dd2d19e91f0cc75227cb4
             self.window.wm_attributes("-topmost", True)
             self.window.overrideredirect(True)
             self.window.configure(background='black')
             self.window.wm_geometry('+' + str(439) + '+' + str(172))
+<<<<<<< HEAD
             for i in range(self.total_msg_display):
                 self.status[i] = tk.Label(self.window, text="Waiting..",foreground="red")
                 self.status[i].config(font=("Courier", int(self.font_size)),background='black')
                 self.status[i].pack(side="top", fill="both", expand=True, padx=10, pady=10)
+=======
+            self.window.configure(background='black')
+            self.status = tk.Label(self.window, text="Waiting..",foreground="yellow")
+            self.status.config(font=("Courier", int(self.font_size)),background='black')
+            self.status.pack(side="top", fill="both", expand=True, padx=10, pady=10)
+>>>>>>> ff85084b49827928757dd2d19e91f0cc75227cb4
 
         return self.frame
 
