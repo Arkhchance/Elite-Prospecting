@@ -46,6 +46,7 @@ class Prospecting():
 
         if change :
             self.refresh_display()
+            self.change_session()
 
     def init_gui(self,parent):
         self.parent = parent
@@ -138,13 +139,17 @@ class Prospecting():
             return
 
         self.connected = True
-        self.sendMsg("session=" + self.session)
+        self.change_session()
         time.sleep(1)
         self.sendMsg("New Player")
         threading.Thread(target=self.recvs).start()
         self.connection["text"] = "Connected"
         time.sleep(2)
         self.connection.grid_remove()
+
+    def change_session(self):
+        if self.connected :
+            self.sendMsg("session=" + self.session)
 
     def stop(self):
         config.set("EP_pos_x", self.pos_x)
