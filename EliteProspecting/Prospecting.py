@@ -59,11 +59,11 @@ class Prospecting():
         else :
             self.win_x = tk.Scale(self.frame, from_=1, to=6000, orient=tk.HORIZONTAL, label="x position",command=self.update_new_win)
             self.win_x.grid(row=row+3, columnspan=2)
-            self.win_x.set(100)
+            self.win_x.set(self.pos_x)
             row += 1
             self.win_y = tk.Scale(self.frame, from_=1, to=3000, orient=tk.HORIZONTAL, label="y position",command=self.update_new_win)
             self.win_y.grid(row=row+6, columnspan=2)
-            self.win_y.set(100)
+            self.win_y.set(self.pos_y)
 
             self.window = tk.Toplevel()
             if sys.platform == 'win32' and self.win_trans == 1 :
@@ -71,7 +71,6 @@ class Prospecting():
             self.window.wm_attributes("-topmost", True)
             self.window.overrideredirect(True)
             self.window.configure(background='black')
-            self.window.wm_geometry('+' + str(439) + '+' + str(172))
 
             for i in range(self.total_msg_display):
                 self.status[i] = tk.Label(self.window)
@@ -79,10 +78,12 @@ class Prospecting():
                 self.status[i].pack(side="top", fill="both", expand=True, padx=10, pady=10)
                 if i == 0 :
                     self.status[i]['text'] = "Waiting..."
-
+            self.window.wm_geometry('+' + str(self.pos_x) + '+' + str(self.pos_y))
         return self.frame
 
     def update_new_win(self,val):
+        self.pos_x = self.win_x.get()
+        self.pos_y = self.win_y.get()
         self.window.wm_geometry('+' + str(self.win_x.get()) + '+' + str(self.win_y.get()))
 
     def display_msg(self,msg,mine=True):
