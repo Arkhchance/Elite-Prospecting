@@ -40,6 +40,10 @@ class Prospecting():
         self.pos_x = config.get("EP_pos_x") or 200
         self.pos_y = config.get("EP_pos_y") or 200
 
+        #sanity check
+        if len(self.session) > 15:
+            self.session = "default"
+            
         if change :
             self.refresh_display()
 
