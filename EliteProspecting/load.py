@@ -17,12 +17,12 @@ def plugin_prefs(parent,cmdr,is_beta):
     frame.columnconfigure(1, weight=1)
 
 
-    this.ltd_p = tk.IntVar(value=config.getint("track_LTD") and 0)
-    this.painite_p = tk.IntVar(value=config.getint("track_Painite") and 0)
-    this.new_win = tk.IntVar(value=config.getint("use_new_window") and 0)
-    this.win_trans = tk.IntVar(value=config.getint("win_trans") and 0)
-    this.miss = tk.IntVar(value=config.getint("miss") and 0)
-    
+    this.ltd_p = tk.IntVar(value=config.getint("EP_track_LTD") and 0)
+    this.painite_p = tk.IntVar(value=config.getint("EP_track_Painite") and 0)
+    this.new_win = tk.IntVar(value=config.getint("EP_use_new_window") and 0)
+    this.win_trans = tk.IntVar(value=config.getint("EP_win_trans") and 0)
+    this.miss = tk.IntVar(value=config.getint("EP_miss") and 0)
+
     this.ip_label = nb.Label(frame,text="Server IP")
     this.ip_label.grid(row=row, padx=PADX, sticky=tk.W)
     this.server_ip = nb.Entry(frame)
@@ -72,13 +72,13 @@ def plugin_prefs(parent,cmdr,is_beta):
     return frame
 
 def load_value():
-    ltd_t = config.get("LTD_t") or 18
-    port = config.get("server_port") or 44988
-    ip = config.get("server_ip") or "127.0.0.1"
-    painite_t = config.get("Painite_t") or 25
-    font_size = config.get("font_size") or 14
-    my_color = config.get("my_color") or "Red"
-    color = config.get("color") or "Yellow"
+    ltd_t = config.get("EP_LTD_t") or 18
+    port = config.get("EP_server_port") or 44988
+    ip = config.get("EP_server_ip") or "127.0.0.1"
+    painite_t = config.get("EP_Painite_t") or 25
+    font_size = config.get("EP_font_size") or 14
+    my_color = config.get("EP_my_color") or "Red"
+    color = config.get("EP_color") or "Yellow"
 
     this.ltd_threshold.insert(0,ltd_t)
     this.server_port.insert(0,port)
@@ -91,18 +91,18 @@ def load_value():
 def prefs_changed(cmdr,is_beta) :
     global prospecting
 
-    config.set("track_LTD", this.ltd_p.get())
-    config.set("track_Painite", this.painite_p.get())
-    config.set("LTD_t", this.ltd_threshold.get())
-    config.set("Painite_t",this.painite_threshold.get())
-    config.set("server_ip",this.server_ip.get())
-    config.set("server_port",this.server_port.get())
-    config.set("font_size",this.font_size.get())
-    config.set("use_new_window",this.new_win.get())
-    config.set("win_trans",this.win_trans.get())
-    config.set("miss",this.miss.get())
-    config.set("my_color",this.my_color.get())
-    config.set("color",this.color.get())
+    config.set("EP_track_LTD", this.ltd_p.get())
+    config.set("EP_track_Painite", this.painite_p.get())
+    config.set("EP_LTD_t", this.ltd_threshold.get())
+    config.set("EP_Painite_t",this.painite_threshold.get())
+    config.set("EP_server_ip",this.server_ip.get())
+    config.set("EP_server_port",this.server_port.get())
+    config.set("EP_font_size",this.font_size.get())
+    config.set("EP_use_new_window",this.new_win.get())
+    config.set("EP_win_trans",this.win_trans.get())
+    config.set("EP_miss",this.miss.get())
+    config.set("EP_my_color",this.my_color.get())
+    config.set("EP_color",this.color.get())
 
     prospecting.load_config(True)
 

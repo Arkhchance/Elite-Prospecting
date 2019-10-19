@@ -20,21 +20,24 @@ class Prospecting():
         print(sys.version)
 
     def load_config(self,change = False):
-        self.ip = config.get("server_ip") or "127.0.0.1"
-        self.port = config.get("server_port") or 44988
+        self.ip = config.get("EP_server_ip") or "127.0.0.1"
+        self.port = config.get("EP_server_port") or 44988
 
-        self.track_LTD = config.getint("track_LTD")
-        self.track_Painite = config.getint("track_Painite")
-        self.new_win = config.getint("use_new_window")
-        self.win_trans = config.getint("win_trans")
-        self.miss = config.getint("miss")
+        self.track_LTD = config.getint("EP_track_LTD")
+        self.track_Painite = config.getint("EP_track_Painite")
+        self.new_win = config.getint("EP_use_new_window")
+        self.win_trans = config.getint("EP_win_trans")
+        self.miss = config.getint("EP_miss")
 
-        self.ltd_threshold = config.get("LTD_t") or 18
-        self.painite_threshold = config.get("Painite_t") or 25
-        self.font_size = config.get("font_size") or 14
+        self.ltd_threshold = config.get("EP_LTD_t") or 18
+        self.painite_threshold = config.get("EP_Painite_t") or 25
+        self.font_size = config.get("EP_font_size") or 14
 
-        self.my_color = config.get("my_color") or "Red"
-        self.color = config.get("color") or "Yellow"
+        self.my_color = config.get("EP_my_color") or "Red"
+        self.color = config.get("EP_color") or "Yellow"
+
+        self.pos_x = config.get("EP_pos_x") or 200
+        self.pos_y = config.get("EP_pos_y") or 200
 
         if change :
             self.refresh_display()
@@ -136,6 +139,8 @@ class Prospecting():
         self.connection.grid_remove()
 
     def stop(self):
+        config.set("EP_pos_x", self.pos_x)
+        config.set("EP_pos_y", self.pos_y)
         if not self.connected:
             return
         self.run = False
