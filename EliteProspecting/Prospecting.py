@@ -21,7 +21,7 @@ class Prospecting():
 
     def load_config(self,change = False):
         self.ip = config.get("EP_server_ip") or "37.59.36.212"
-        self.port = config.get("EP_server_port") or 44988
+        self.port = config.getint("EP_server_port") or 44988
         self.session = config.get("EP_session") or "default"
 
         self.track_LTD = config.getint("EP_track_LTD")
@@ -30,20 +30,20 @@ class Prospecting():
         self.win_trans = config.getint("EP_win_trans")
         self.miss = config.getint("EP_miss")
 
-        self.ltd_threshold = config.get("EP_LTD_t") or 18
-        self.painite_threshold = config.get("EP_Painite_t") or 25
-        self.font_size = config.get("EP_font_size") or 14
+        self.ltd_threshold = config.getint("EP_LTD_t") or 18
+        self.painite_threshold = config.getint("EP_Painite_t") or 25
+        self.font_size = config.getint("EP_font_size") or 14
 
         self.my_color = config.get("EP_my_color") or "Red"
         self.color = config.get("EP_color") or "Yellow"
 
-        self.pos_x = config.get("EP_pos_x") or 200
-        self.pos_y = config.get("EP_pos_y") or 200
+        self.pos_x = config.getint("EP_pos_x") or 200
+        self.pos_y = config.getint("EP_pos_y") or 200
 
         #sanity check
         if len(self.session) > 15:
             self.session = "default"
-            
+
         if change :
             self.refresh_display()
 
