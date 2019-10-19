@@ -198,13 +198,13 @@ class Prospecting():
                     self.publish(cmdr,mat['Name_Localised'],mat['Proportion'])
                 else :
                     below_t = True
-                    empty = False
+                empty = False
             elif mat['Name'] == "Painite" and self.track_Painite == 1 :
                 if mat['Proportion'] > float(self.painite_threshold):
                     self.publish(cmdr,mat['Name_Localised'],mat['Proportion'])
                 else :
                     below_t = True
-                    empty = False
+                empty = False
 
         if self.miss == 1 :
             if empty and not below_t:
