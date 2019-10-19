@@ -17,11 +17,11 @@ def plugin_prefs(parent,cmdr,is_beta):
     frame.columnconfigure(1, weight=1)
 
 
-    this.ltd_p = tk.IntVar(value=config.getint("EP_track_LTD") and 0)
-    this.painite_p = tk.IntVar(value=config.getint("EP_track_Painite") and 0)
-    this.new_win = tk.IntVar(value=config.getint("EP_use_new_window") and 0)
-    this.win_trans = tk.IntVar(value=config.getint("EP_win_trans") and 0)
-    this.miss = tk.IntVar(value=config.getint("EP_miss") and 0)
+    this.ltd_p = tk.IntVar(value=config.getint("EP_track_LTD"))
+    this.painite_p = tk.IntVar(value=config.getint("EP_track_Painite"))
+    this.new_win = tk.IntVar(value=config.getint("EP_use_new_window"))
+    this.win_trans = tk.IntVar(value=config.getint("EP_win_trans"))
+    this.miss = tk.IntVar(value=config.getint("EP_miss"))
 
     this.ip_label = nb.Label(frame,text="Server IP")
     this.ip_label.grid(row=row, padx=PADX, sticky=tk.W)
@@ -33,6 +33,12 @@ def plugin_prefs(parent,cmdr,is_beta):
     this.port_label.grid(row=row, padx=PADX, sticky=tk.W)
     this.server_port = nb.Entry(frame)
     this.server_port.grid(row=row, column=1, padx=PADX, pady=PADY, sticky=tk.EW)
+
+    row += 1
+    this.session_label = nb.Label(frame,text="Server session")
+    this.session_label.grid(row=row, padx=PADX, sticky=tk.W)
+    this.server_session = nb.Entry(frame)
+    this.server_session.grid(row=row, column=1, padx=PADX, pady=PADY, sticky=tk.EW)
 
     row += 1
     this.font_size_label = nb.Label(frame,text="font size")
@@ -74,11 +80,12 @@ def plugin_prefs(parent,cmdr,is_beta):
 def load_value():
     ltd_t = config.get("EP_LTD_t") or 18
     port = config.get("EP_server_port") or 44988
-    ip = config.get("EP_server_ip") or "127.0.0.1"
+    ip = config.get("EP_server_ip") or "37.59.36.212"
     painite_t = config.get("EP_Painite_t") or 25
     font_size = config.get("EP_font_size") or 14
     my_color = config.get("EP_my_color") or "Red"
     color = config.get("EP_color") or "Yellow"
+    session = config.get("EP_session") or "default"
 
     this.ltd_threshold.insert(0,ltd_t)
     this.server_port.insert(0,port)
@@ -86,6 +93,7 @@ def load_value():
     this.painite_threshold.insert(0,painite_t)
     this.font_size.insert(0,font_size)
     this.my_color.insert(0,my_color)
+    this.server_session.insert(0,session)
     this.color.insert(0,color)
 
 def prefs_changed(cmdr,is_beta) :
@@ -103,6 +111,7 @@ def prefs_changed(cmdr,is_beta) :
     config.set("EP_miss",this.miss.get())
     config.set("EP_my_color",this.my_color.get())
     config.set("EP_color",this.color.get())
+    config.set("EP_session",this.server_session.get())
 
     prospecting.load_config(True)
 

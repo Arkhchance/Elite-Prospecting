@@ -20,8 +20,9 @@ class Prospecting():
         print(sys.version)
 
     def load_config(self,change = False):
-        self.ip = config.get("EP_server_ip") or "127.0.0.1"
+        self.ip = config.get("EP_server_ip") or "37.59.36.212"
         self.port = config.get("EP_server_port") or 44988
+        self.session = config.get("EP_session") or "default"
 
         self.track_LTD = config.getint("EP_track_LTD")
         self.track_Painite = config.getint("EP_track_Painite")
@@ -133,6 +134,8 @@ class Prospecting():
             return
 
         self.connected = True
+        self.sendMsg("session=" + self.session)
+        time.sleep(1)
         self.sendMsg("New Player")
         threading.Thread(target=self.recvs).start()
         self.connection["text"] = "Connected"
