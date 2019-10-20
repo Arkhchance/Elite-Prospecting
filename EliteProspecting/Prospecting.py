@@ -51,18 +51,22 @@ class Prospecting():
 
     def init_gui(self,parent):
         self.parent = parent
-        self.frame = tk.Frame(parent, borderwidth=2)
+        self.frame = tk.Frame(self.parent, borderwidth=2)
         self.frame.grid(sticky=tk.NSEW, columnspan=2)
+        self.update_gui()
+        return self.frame
 
-        row = 0
+    def update_gui(self):
+        row = 1
+        if self.track_cargo == 1 :
+            self.cargo = tk.Label(self.frame, text="Cargo : ")
+            self.cargo.config(font=("Courier", int(self.font_size)))
+            self.cargo.grid(row=row, pady=5, sticky=tk.W)
+            row += 1
         self.connection = tk.Button(self.frame, text="Connect to server", command=self.connect)
         self.connection.grid(row=row, columnspan=2)
+
         if self.new_win == 0:
-            if self.track_cargo == 1 :
-                self.cargo = tk.Label(self.frame, text="Cargo : ")
-                self.cargo.config(font=("Courier", int(self.font_size)))
-                self.cargo.grid(row=row, pady=5, sticky=tk.W)
-                row += 1
             for i in range(self.total_msg_display):
                 self.status[i] = tk.Label(self.frame, text="", foreground="yellow")
                 self.status[i].config(font=("Courier", int(self.font_size)))
@@ -96,7 +100,6 @@ class Prospecting():
                 if i == 0 :
                     self.status[i]['text'] = "Waiting..."
             self.window.wm_geometry('+' + str(self.pos_x) + '+' + str(self.pos_y))
-        return self.frame
 
     def update_new_win(self,val):
         self.pos_x = self.win_x.get()
