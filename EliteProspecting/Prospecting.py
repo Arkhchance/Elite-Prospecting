@@ -29,6 +29,7 @@ class Prospecting():
         self.new_win = config.getint("EP_use_new_window")
         self.win_trans = config.getint("EP_win_trans")
         self.miss = config.getint("EP_miss")
+        self.track_cargo = config.getint("EP_track_cargo")
 
         self.ltd_threshold = config.getint("EP_LTD_t") or 18
         self.painite_threshold = config.getint("EP_Painite_t") or 25
@@ -57,6 +58,11 @@ class Prospecting():
         self.connection = tk.Button(self.frame, text="Connect to server", command=self.connect)
         self.connection.grid(row=row, columnspan=2)
         if self.new_win == 0:
+            if self.track_cargo == 1 :
+                self.cargo = tk.Label(self.frame, text="Cargo : ")
+                self.cargo.config(font=("Courier", int(self.font_size)))
+                self.cargo.grid(row=row, pady=5, sticky=tk.W)
+                row += 1
             for i in range(self.total_msg_display):
                 self.status[i] = tk.Label(self.frame, text="", foreground="yellow")
                 self.status[i].config(font=("Courier", int(self.font_size)))
@@ -77,6 +83,11 @@ class Prospecting():
             self.window.wm_attributes("-topmost", True)
             self.window.overrideredirect(True)
             self.window.configure(background='black')
+
+            if self.track_cargo == 1 :
+                self.cargo = tk.Label(self.window, text="Cargo : ")
+                self.cargo.config(font=("Courier", int(self.font_size)),background='black')
+                self.cargo.pack(side="top", fill="both", expand=True, padx=10, pady=10)
 
             for i in range(self.total_msg_display):
                 self.status[i] = tk.Label(self.window)
@@ -186,6 +197,11 @@ class Prospecting():
         if self.connected :
             self.sendMsg(message)
         self.display_msg(message,True)
+
+    def cargo_event(self,entry):
+        if self.track_cargo == 1:
+            if "Count" in entry:
+                self.cargo['text'] = "Cargo : " + str(entry['Count'])
 
     def event(self,cmdr,entry):
         #received a ProspectedAsteroid event

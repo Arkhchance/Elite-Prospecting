@@ -22,6 +22,7 @@ def plugin_prefs(parent,cmdr,is_beta):
     this.new_win = tk.IntVar(value=config.getint("EP_use_new_window"))
     this.win_trans = tk.IntVar(value=config.getint("EP_win_trans"))
     this.miss = tk.IntVar(value=config.getint("EP_miss"))
+    this.cargo = tk.IntVar(value=config.getint("EP_track_cargo"))
 
     this.ip_label = nb.Label(frame,text="Server IP")
     this.ip_label.grid(row=row, padx=PADX, sticky=tk.W)
@@ -35,7 +36,7 @@ def plugin_prefs(parent,cmdr,is_beta):
     this.server_port.grid(row=row, column=1, padx=PADX, pady=PADY, sticky=tk.EW)
 
     row += 1
-    this.session_label = nb.Label(frame,text="Server session")
+    this.session_label = nb.Label(frame,text="Server room")
     this.session_label.grid(row=row, padx=PADX, sticky=tk.W)
     this.server_session = nb.Entry(frame)
     this.server_session.grid(row=row, column=1, padx=PADX, pady=PADY, sticky=tk.EW)
@@ -52,6 +53,8 @@ def plugin_prefs(parent,cmdr,is_beta):
     nb.Checkbutton(frame, text='Make the window transparent (windows only)', variable=this.win_trans).grid(row=row, column=0, padx=PADX, pady=PADY, sticky=tk.EW)
     row += 1
     nb.Checkbutton(frame, text='Display message if asteroid target doesn\'t meet requirement', variable=this.miss).grid(row=row, column=0, padx=PADX, pady=PADY, sticky=tk.EW)
+    row += 1
+    nb.Checkbutton(frame, text='Track your cargo (require restart)', variable=this.cargo).grid(row=row, column=0, padx=PADX, pady=PADY, sticky=tk.EW)
 
     row += 1
     this.my_color_label = nb.Label(frame,text="My Color : ")
@@ -112,6 +115,7 @@ def prefs_changed(cmdr,is_beta) :
     config.set("EP_my_color",this.my_color.get())
     config.set("EP_color",this.color.get())
     config.set("EP_session",this.server_session.get())
+    config.set("EP_track_cargo",this.cargo.get())
 
     prospecting.load_config(True)
 
@@ -128,8 +132,11 @@ def plugin_start(plugin_dir):
 
 def journal_entry(cmdr,is_beta,system,station,entry,state):
     global prospecting
+
     if entry['event'] == "ProspectedAsteroid":
         prospecting.event(cmdr,entry)
+    elif entry['event'] == "Cargo" :
+        prospecting.cargo_event(entry)
 
 def plugin_stop():
     global prospecting
