@@ -85,17 +85,16 @@ class Prospecting():
         return self.frame
 
     def update_gui(self):
+        try:
+            self.window.destroy()
+        except AttributeError as e :
+            print("window not created ", e)
         if self.new_win == 1 :
             self.win_x.grid()
             self.win_y.grid()
             self.mw_cargo.grid_remove()
             for i in range(self.total_msg_display):
                 self.mw_status[i].grid_remove()
-
-            try:
-                self.window.destroy()
-            except AttributeError as e :
-                print("window not created ", e)
 
             self.window = tk.Toplevel()
             if sys.platform == 'win32' and self.win_trans == 1 :
@@ -126,14 +125,6 @@ class Prospecting():
             self.win_y.grid_remove()
             for i in range(self.total_msg_display):
                 self.mw_status[i].grid()
-
-            try:
-                self.window.destroy()
-            except AttributeError as e :
-                print("window not created ", e)
-
-
-
 
     def update_new_win(self,val):
         self.pos_x = self.win_x.get()
