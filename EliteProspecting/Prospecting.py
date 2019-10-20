@@ -7,12 +7,14 @@ from config import config
 class Prospecting():
     def __init__(self):
         self.connected = False
+        self.gui_init = False
         self.run = True
         self.parent = None
         self.total_msg  = 0
         self.messages = []
         self.colors = []
         self.total_msg_display = 6
+        self.mw_status = [None] * self.total_msg_display
         self.status = [None] * self.total_msg_display
         self.buffer = 1024
         self.sock = socket.socket(socket.AF_INET , socket.SOCK_STREAM)
@@ -36,7 +38,7 @@ class Prospecting():
         self.font_size = config.getint("EP_font_size") or 14
 
         self.my_color = config.get("EP_my_color") or "Red"
-        self.color = config.get("EP_color") or "Yellow"
+        self.color = config.get("EP_color") or "Blue"
 
         self.pos_x = config.getint("EP_pos_x") or 200
         self.pos_y = config.getint("EP_pos_y") or 200
@@ -46,40 +48,54 @@ class Prospecting():
             self.session = "default"
 
         if change :
-            self.refresh_display()
             self.change_session()
+            self.update_gui()
+            self.refresh_display()
 
     def init_gui(self,parent):
         self.parent = parent
         self.frame = tk.Frame(self.parent, borderwidth=2)
         self.frame.grid(sticky=tk.NSEW, columnspan=2)
+
+        row = 0
+        self.connection = tk.Button(self.frame, text="Connect to server", command=self.connect)
+        self.connection.grid(row=row, padx=0)
+        row += 1
+        self.mw_cargo = tk.Label(self.frame, text="Cargo : ")
+        self.mw_cargo.config(font=("Courier", int(self.font_size)))
+        self.mw_cargo.grid(row=row, pady=5, sticky=tk.W)
+
+
+        for i in range(self.total_msg_display):
+            self.mw_status[i] = tk.Label(self.frame, text="", foreground="yellow")
+            self.mw_status[i].config(font=("Courier", int(self.font_size)))
+            row += 1
+            self.mw_status[i].grid(row=row, pady=5, sticky=tk.W)
+
+        self.win_x = tk.Scale(self.frame, from_=1, to=6000, orient=tk.HORIZONTAL, label="x position",command=self.update_new_win)
+        self.win_x.grid(row=row+3, columnspan=2)
+        self.win_x.set(self.pos_x)
+        row += 1
+        self.win_y = tk.Scale(self.frame, from_=1, to=3000, orient=tk.HORIZONTAL, label="y position",command=self.update_new_win)
+        self.win_y.grid(row=row+6, columnspan=2)
+        self.win_y.set(self.pos_y)
+
         self.update_gui()
+        self.gui_init = True
         return self.frame
 
     def update_gui(self):
-        row = 1
-        if self.track_cargo == 1 :
-            self.cargo = tk.Label(self.frame, text="Cargo : ")
-            self.cargo.config(font=("Courier", int(self.font_size)))
-            self.cargo.grid(row=row, pady=5, sticky=tk.W)
-            row += 1
-        self.connection = tk.Button(self.frame, text="Connect to server", command=self.connect)
-        self.connection.grid(row=row, columnspan=2)
-
-        if self.new_win == 0:
+        if self.new_win == 1 :
+            self.win_x.grid()
+            self.win_y.grid()
+            self.mw_cargo.grid_remove()
             for i in range(self.total_msg_display):
-                self.status[i] = tk.Label(self.frame, text="", foreground="yellow")
-                self.status[i].config(font=("Courier", int(self.font_size)))
-                row += 1
-                self.status[i].grid(row=row, pady=5, sticky=tk.W)
-        else :
-            self.win_x = tk.Scale(self.frame, from_=1, to=6000, orient=tk.HORIZONTAL, label="x position",command=self.update_new_win)
-            self.win_x.grid(row=row+3, columnspan=2)
-            self.win_x.set(self.pos_x)
-            row += 1
-            self.win_y = tk.Scale(self.frame, from_=1, to=3000, orient=tk.HORIZONTAL, label="y position",command=self.update_new_win)
-            self.win_y.grid(row=row+6, columnspan=2)
-            self.win_y.set(self.pos_y)
+                self.mw_status[i].grid_remove()
+
+            try:
+                self.window.destroy()
+            except AttributeError as e :
+                print("window not created ", e)
 
             self.window = tk.Toplevel()
             if sys.platform == 'win32' and self.win_trans == 1 :
@@ -88,10 +104,9 @@ class Prospecting():
             self.window.overrideredirect(True)
             self.window.configure(background='black')
 
-            if self.track_cargo == 1 :
-                self.cargo = tk.Label(self.window, text="Cargo : ")
-                self.cargo.config(font=("Courier", int(self.font_size)),background='black')
-                self.cargo.pack(side="top", fill="both", expand=True, padx=10, pady=10)
+            self.cargo = tk.Label(self.window, text="Cargo : ")
+            self.cargo.config(font=("Courier", int(self.font_size)),background='black')
+            self.cargo.pack(side="top", fill="both", expand=True, padx=10, pady=10)
 
             for i in range(self.total_msg_display):
                 self.status[i] = tk.Label(self.window)
@@ -100,11 +115,31 @@ class Prospecting():
                 if i == 0 :
                     self.status[i]['text'] = "Waiting..."
             self.window.wm_geometry('+' + str(self.pos_x) + '+' + str(self.pos_y))
+            if self.track_cargo == 0 :
+                self.cargo.pack_forget()
+        else :
+            if self.track_cargo == 1 :
+                self.mw_cargo.grid()
+            else :
+                self.mw_cargo.grid_remove()
+            self.win_x.grid_remove()
+            self.win_y.grid_remove()
+            for i in range(self.total_msg_display):
+                self.mw_status[i].grid()
+
+            try:
+                self.window.destroy()
+            except AttributeError as e :
+                print("window not created ", e)
+
+
+
 
     def update_new_win(self,val):
         self.pos_x = self.win_x.get()
         self.pos_y = self.win_y.get()
-        self.window.wm_geometry('+' + str(self.win_x.get()) + '+' + str(self.win_y.get()))
+        if self.new_win == 1 :
+            self.window.wm_geometry('+' + str(self.win_x.get()) + '+' + str(self.win_y.get()))
 
     def display_msg(self,msg,mine=True):
         if mine :
@@ -129,9 +164,12 @@ class Prospecting():
                 color = self.my_color
             else :
                 color = self.color
-
-            self.status[i].config(foreground=color)
-            self.status[i]['text'] = self.messages[i]
+            if self.new_win == 1 :
+                self.status[i].config(foreground=color)
+                self.status[i]['text'] = self.messages[i]
+            else :
+                self.mw_status[i].config(foreground=color)
+                self.mw_status[i]['text'] = self.messages[i]
 
     def sendMsg(self,message):
         try :

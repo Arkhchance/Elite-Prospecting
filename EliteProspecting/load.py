@@ -48,13 +48,13 @@ def plugin_prefs(parent,cmdr,is_beta):
     this.font_size.grid(row=row, column=1, padx=PADX, pady=PADY, sticky=tk.EW)
 
     row += 1
-    nb.Checkbutton(frame, text='Display result on new window (require restart)', variable=this.new_win).grid(row=row, column=0, padx=PADX, pady=PADY, sticky=tk.EW)
+    nb.Checkbutton(frame, text='Display result on new window', variable=this.new_win).grid(row=row, column=0, padx=PADX, pady=PADY, sticky=tk.EW)
     row += 1
     nb.Checkbutton(frame, text='Make the window transparent (windows only)', variable=this.win_trans).grid(row=row, column=0, padx=PADX, pady=PADY, sticky=tk.EW)
     row += 1
     nb.Checkbutton(frame, text='Display message if asteroid target doesn\'t meet requirement', variable=this.miss).grid(row=row, column=0, padx=PADX, pady=PADY, sticky=tk.EW)
     row += 1
-    nb.Checkbutton(frame, text='Track your cargo (require restart)', variable=this.cargo).grid(row=row, column=0, padx=PADX, pady=PADY, sticky=tk.EW)
+    nb.Checkbutton(frame, text='Track your cargo', variable=this.cargo).grid(row=row, column=0, padx=PADX, pady=PADY, sticky=tk.EW)
 
     row += 1
     this.my_color_label = nb.Label(frame,text="My Color : ")
@@ -87,7 +87,7 @@ def load_value():
     painite_t = config.get("EP_Painite_t") or 25
     font_size = config.get("EP_font_size") or 14
     my_color = config.get("EP_my_color") or "Red"
-    color = config.get("EP_color") or "Yellow"
+    color = config.get("EP_color") or "Blue"
     session = config.get("EP_session") or "default"
 
     this.ltd_threshold.insert(0,ltd_t)
