@@ -17,6 +17,8 @@ class Prospecting():
         self.mw_status = [None] * self.total_msg_display
         self.status = [None] * self.total_msg_display
         self.buffer = 1024
+        self.ore = 0
+        self.qty_cargo = 0
         self.sock = socket.socket(socket.AF_INET , socket.SOCK_STREAM)
         self.load_config()
         print(sys.version)
@@ -162,6 +164,12 @@ class Prospecting():
                 self.mw_status[i].config(foreground=color)
                 self.mw_status[i]['text'] = self.messages[i]
 
+    def refresh_cargo():
+        if self.new_win == 1 :
+            self.cargo['text'] = "Cargo : " + str(self.qty_cargo) + " Ore : " + str(self.ore)
+        else:
+            self.mw_cargo['text'] = "Cargo : " + str(self.qty_cargo) + " Ore : " + str(self.ore)
+
     def sendMsg(self,message):
         try :
             self.sock.sendall(message.encode())
@@ -233,8 +241,15 @@ class Prospecting():
     def cargo_event(self,entry):
         if self.track_cargo == 1:
             if "Count" in entry:
-                self.cargo['text'] = "Cargo : " + str(entry['Count'])
+                self.qty_cargo = entry['Count']
+                if self.qty_cargo == 0 :
+                    self.ore = 0
+                self.refresh_cargo()
 
+    def refined_event(self):
+        self.ore += 1
+        self.refresh_cargo()
+        
     def event(self,cmdr,entry):
         #received a ProspectedAsteroid event
         empty = True

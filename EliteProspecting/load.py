@@ -137,6 +137,8 @@ def journal_entry(cmdr,is_beta,system,station,entry,state):
         prospecting.event(cmdr,entry)
     elif entry['event'] == "Cargo" :
         prospecting.cargo_event(entry)
+    elif entry['event'] == "MiningRefined" :
+        prospecting.refined_event()
 
 def plugin_stop():
     global prospecting
