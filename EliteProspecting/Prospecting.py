@@ -164,7 +164,7 @@ class Prospecting():
                 self.mw_status[i].config(foreground=color)
                 self.mw_status[i]['text'] = self.messages[i]
 
-    def refresh_cargo():
+    def refresh_cargo(self):
         if self.new_win == 1 :
             self.cargo['text'] = "Cargo : " + str(self.qty_cargo) + " Ore : " + str(self.ore)
         else:
@@ -249,7 +249,7 @@ class Prospecting():
     def refined_event(self):
         self.ore += 1
         self.refresh_cargo()
-        
+
     def event(self,cmdr,entry):
         #received a ProspectedAsteroid event
         empty = True
