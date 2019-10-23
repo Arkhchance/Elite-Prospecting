@@ -10,12 +10,10 @@ prospecting = None
 
 def plugin_prefs(parent,cmdr,is_beta):
     PADX = 10
-    BUTTONX = 12	# indent Checkbuttons and Radiobuttons
     PADY = 2		# close spacing
     row = 1
     frame = nb.Frame(parent)
     frame.columnconfigure(1, weight=1)
-
 
     this.ltd_p = tk.IntVar(value=config.getint("EP_track_LTD"))
     this.painite_p = tk.IntVar(value=config.getint("EP_track_Painite"))
@@ -61,6 +59,7 @@ def plugin_prefs(parent,cmdr,is_beta):
     this.my_color_label.grid(row=row, padx=PADX, sticky=tk.W)
     this.my_color = nb.Entry(frame)
     this.my_color.grid(row=row, column=1, padx=PADX, pady=PADY, sticky=tk.EW)
+
     row += 1
     this.color_label = nb.Label(frame,text="Others Color : ")
     this.color_label.grid(row=row, padx=PADX, sticky=tk.W)
@@ -81,11 +80,11 @@ def plugin_prefs(parent,cmdr,is_beta):
     return frame
 
 def load_value():
-    ltd_t = config.get("EP_LTD_t") or 18
-    port = config.get("EP_server_port") or 44988
+    ltd_t = config.getint("EP_LTD_t") or 18
+    port = config.getint("EP_server_port") or 44988
     ip = config.get("EP_server_ip") or "37.59.36.212"
-    painite_t = config.get("EP_Painite_t") or 25
-    font_size = config.get("EP_font_size") or 14
+    painite_t = config.getint("EP_Painite_t") or 25
+    font_size = config.getint("EP_font_size") or 14
     my_color = config.get("EP_my_color") or "Red"
     color = config.get("EP_color") or "Blue"
     session = config.get("EP_session") or "default"
