@@ -1,6 +1,10 @@
 #!/usr/bin/python
-import socket, sys, threading
-import signal, time
+import socket
+import sys
+import threading
+import signal
+import time
+import json
 
 #change as needed
 HOST = '0.0.0.0'
@@ -11,15 +15,16 @@ BUFFER = 1024
 run = True
 conn_client = {}                # active connection array
 session_list = {}               #session list
+quit_msg = {"act": "quit"}
+quit_msg = json.dumps(quit_msg).encode()
 def receiveSignal(signalNumber, frame):
     print('Received Signal ', signalNumber)
     print("exiting..")
     run = False
-    msg = "quit"
     time.sleep(2)
     for con in conn_client:
         try:
-            conn_client[con].send(msg.encode())
+            conn_client[con].send(quit_msg)
             conn_client[con].close()
         except socket.error as e:
             print("error closing ",str(e))
@@ -39,19 +44,24 @@ class ThreadClient(threading.Thread):
         while run:
             msgClient = self.connexion.recv(BUFFER)
 
-            msg = msgClient.decode()
+            try :
+                msg = json.loads(msgClient.decode())
+            except ValueError as e:
+                print("incorect format ",e)
+                print(msgClient.decode())
+                continue
+
             #if client send QUIT => terminate the conenction
-            if msg == "quit" :
-                quit = "quit"
+            if msg['act'] == "quit" :
                 print("client exitting")
-                conn_client[nom].send(quit.encode())
+                conn_client[nom].send(quit_msg)
                 break
             #change client session
-            elif msg.find('session=') != -1 :
+            elif msg['act'] == "session" :
                 #remove from old one
 
                 session_list[session_name].remove(nom)
-                session_name = msg.replace("session=","")
+                session_name = msg['data']
                 print("client is changing to session ",session_name)
                 if session_name == "quit" :
                     session_name = "default"
@@ -63,13 +73,11 @@ class ThreadClient(threading.Thread):
                 cleanup()
                 continue
 
-
-            print("received ", msg)
             # send to all client in session:
             for name in session_list[session_name]:
                 if name != nom : #don't send to ourself
                     try:
-                        conn_client[name].send(msg.encode())
+                        conn_client[name].send(msgClient)
                     except socket.error as e:
                         print("error sending ",str(e))
 
@@ -103,7 +111,7 @@ def main() :
     try:
         mySocket.bind((HOST, PORT))
     except socket.error as e:
-        print("Can't bind quitting. ", str(e))
+        print("Can't bind quitting. ", e)
         sys.exit()
 
     print("Server is ready.. ")
@@ -111,7 +119,11 @@ def main() :
 
     #create default session
     session_list["default"] = []
-
+    con_response = {
+        "act" : "connexion",
+        "data" : "connected"
+    }
+    con_response = json.dumps(con_response).encode()
     while run:
         connexion, adresse = mySocket.accept()
         # new thread :
@@ -122,8 +134,8 @@ def main() :
         conn_client[it] = connexion
         print ("Client %s connected, IP address %s, port %s." %(it, adresse[0], adresse[1]))
         # Answer to connection sucess :
-        msg = "Connected"
-        connexion.send(msg.encode())
+
+        connexion.send(con_response)
 
 
 

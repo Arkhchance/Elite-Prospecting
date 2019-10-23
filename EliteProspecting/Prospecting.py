@@ -1,7 +1,11 @@
 #!/usr/bin/python
 import Tkinter as tk
-import socket , sys , time
+import socket
+import sys
+import time
 import threading
+import hashlib
+import json
 from config import config
 
 class Prospecting():
@@ -12,6 +16,7 @@ class Prospecting():
         self.parent = None
         self.total_msg  = 0
         self.messages = []
+        self.hashlist = []
         self.colors = []
         self.total_msg_display = 6
         self.mw_status = [None] * self.total_msg_display
@@ -19,7 +24,6 @@ class Prospecting():
         self.buffer = 1024
         self.ore = 0
         self.qty_cargo = 0
-        self.sock = socket.socket(socket.AF_INET , socket.SOCK_STREAM)
         self.load_config()
         print(sys.version)
 
@@ -165,6 +169,21 @@ class Prospecting():
                 self.mw_status[i].config(foreground=color)
                 self.mw_status[i]['text'] = self.messages[i]
 
+    def process_msg(self,json_data):
+        msg_hash = json_data['hash']
+        msg = json_data['cmdr']
+        if msg_hash in self.hashlist :
+            #duplicate !
+            if self.miss == 1 :
+                msg += " duplicate"
+                self.display_msg(msg,False)
+            return #stop here
+        else:
+            self.hashlist.append(msg_hash)
+
+        msg += " " + json_data['data']
+        self.display_msg(msg,False)
+
     def refresh_cargo(self):
         if self.track_cargo == 1:
             if self.new_win == 1 :
@@ -180,6 +199,7 @@ class Prospecting():
             print("Caught exception socket.error : %s" % e)
 
     def connect(self):
+        self.sock = socket.socket(socket.AF_INET , socket.SOCK_STREAM)
         try :
             self.connection["text"] = "Connecting..."
             print("connecting to ",self.ip)
@@ -191,18 +211,27 @@ class Prospecting():
             self.connection["text"] = "Error connecting check configuration"
             return
 
+        con_succes = {
+            "act" : "connexion",
+            "data" : "Player join"
+        }
         self.connected = True
         self.change_session()
         time.sleep(1)
-        self.sendMsg("New Player")
+        self.sendMsg(json.dumps(con_succes).encode())
         threading.Thread(target=self.recvs).start()
         self.connection["text"] = "Connected"
         time.sleep(2)
         self.connection.grid_remove()
 
     def change_session(self):
+        to_send = {
+            "act" : "session",
+            "data" : self.session
+        }
         if self.connected :
-            self.sendMsg("session=" + self.session)
+
+            self.sendMsg(json.dumps(to_send))
 
     def stop(self):
         config.set("EP_pos_x", self.pos_x)
@@ -211,12 +240,15 @@ class Prospecting():
             return
         self.run = False
         self.connected = False
-        self.sendMsg("quit")
+        quit_msg = {"act": "quit"}
+        self.sendMsg(json.dumps(quit_msg))
         time.sleep(1)
         try:
             self.sock.close()
         except socket.error as e:
             print("socket.error : %s" % e)
+
+        self.connection.grid()
 
     def recvMsg(self):
         data = self.sock.recv(self.buffer)
@@ -226,25 +258,44 @@ class Prospecting():
         while self.run:
             try:
                 msg = self.recvMsg()
-                if msg.decode() == "quit":
-                    break
-                self.display_msg(msg,False)
             except socket.error as e:
                 print("error receiving")
                 print("Caught exception socket.error : %s" % e)
 
-    def publish(self,cmdr,name,prop):
-        message = cmdr + " " + name + " {:.2f}%"
-        message = message.format(prop)
+            try:
+                decoded = json.loads(msg)
+                if decoded['act'] == "quit":
+                    self.stop()
+                    break
+                elif decoded['act'] == "event":
+                    self.process_msg(decoded)
+                elif decoded['act'] == "connexion":
+                    self.display_msg(decoded['data'],True)
+            except ValueError as e:
+                print("Bad formating ",e)
+
+    def publish(self,cmdr,name,prop,hash,duplicate):
+        data = name + " {:.2f}%"
+        data = data.format(prop)
+        message = {
+            "act" : "event",
+            "cmdr" : cmdr,
+            "data" : data,
+            "hash" : hash
+        }
+
         if self.connected :
-            self.sendMsg(message)
-        self.display_msg(message,True)
+            self.sendMsg(json.dumps(message))
+        if not duplicate :
+            to_display = cmdr + " " + name + " {:.2f}%"
+            self.display_msg(to_display.format(prop),True)
 
     def cargo_event(self,entry):
         if "Count" in entry:
             self.qty_cargo = entry['Count']
             if self.qty_cargo == 0 :
                 self.ore = 0
+                self.hashlist.clear()
             self.refresh_cargo()
 
     def refined_event(self):
@@ -255,22 +306,35 @@ class Prospecting():
         #received a ProspectedAsteroid event
         empty = True
         below_t = False
+        duplicate = False
+
+        mat_hash = hashlib.md5(json.dumps(entry["Materials"]).encode()).hexdigest()
+        print("mat hash : ", mat_hash)
+
+        if mat_hash in self.hashlist :
+            duplicate = True
+        else :
+            self.hashlist.append(mat_hash)
+
         #check for materials
         for mat in entry['Materials']:
             if mat['Name'] == "LowTemperatureDiamond" and self.track_LTD == 1 :
                 if mat['Proportion'] > float(self.ltd_threshold):
-                    self.publish(cmdr,mat['Name_Localised'],mat['Proportion'])
+                    self.publish(cmdr,mat['Name_Localised'],mat['Proportion'],mat_hash,duplicate)
                 else :
                     below_t = True
                 empty = False
             elif mat['Name'] == "Painite" and self.track_Painite == 1 :
                 if mat['Proportion'] > float(self.painite_threshold):
-                    self.publish(cmdr,mat['Name_Localised'],mat['Proportion'])
+                    self.publish(cmdr,mat['Name_Localised'],mat['Proportion'],mat_hash,duplicate)
                 else :
                     below_t = True
                 empty = False
 
         if self.miss == 1 :
+            if duplicate :
+                self.display_msg("Asteroid already prospected",True)
+                return
             if empty and not below_t:
                 self.display_msg("Asteroid without materials",True)
             if below_t :
