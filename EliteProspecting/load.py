@@ -52,7 +52,7 @@ def plugin_prefs(parent,cmdr,is_beta):
     row += 1
     nb.Checkbutton(frame, text='Make the window transparent (windows only)', variable=this.win_trans).grid(row=row, column=0, padx=PADX, pady=PADY, sticky=tk.EW)
     row += 1
-    nb.Checkbutton(frame, text='Display message if asteroid target doesn\'t meet requirement', variable=this.miss).grid(row=row, column=0, padx=PADX, pady=PADY, sticky=tk.EW)
+    nb.Checkbutton(frame, text='Display a message if prospected asteroid doesn\'t meet requirement', variable=this.miss).grid(row=row, column=0, padx=PADX, pady=PADY, sticky=tk.EW)
     row += 1
     nb.Checkbutton(frame, text='Track your cargo', variable=this.cargo).grid(row=row, column=0, padx=PADX, pady=PADY, sticky=tk.EW)
 
