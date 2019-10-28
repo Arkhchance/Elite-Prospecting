@@ -326,7 +326,7 @@ class Prospecting():
                 empty = False
             elif mat['Name'] == "Painite" and self.track_Painite == 1 :
                 if mat['Proportion'] > float(self.painite_threshold):
-                    self.publish(cmdr,mat['Name_Localised'],mat['Proportion'],mat_hash,duplicate)
+                    self.publish(cmdr,"Painite",mat['Proportion'],mat_hash,duplicate)
                 else :
                     below_t = True
                 empty = False
