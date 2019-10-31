@@ -80,11 +80,11 @@ def plugin_prefs(parent,cmdr,is_beta):
     return frame
 
 def load_value():
-    ltd_t = config.getint("EP_LTD_t") or 18
-    port = config.getint("EP_server_port") or 44988
+    ltd_t = config.get("EP_LTD_t") or "18"
+    port = config.get("EP_server_port") or "44988"
     ip = config.get("EP_server_ip") or "37.59.36.212"
-    painite_t = config.getint("EP_Painite_t") or 25
-    font_size = config.getint("EP_font_size") or 14
+    painite_t = config.get("EP_Painite_t") or "25"
+    font_size = config.get("EP_font_size") or "14"
     my_color = config.get("EP_my_color") or "Red"
     color = config.get("EP_color") or "Blue"
     session = config.get("EP_session") or "default"

@@ -12,6 +12,7 @@ class Prospecting():
     def __init__(self):
         self.connected = False
         self.gui_init = False
+        self.msg_send = False
         self.run = True
         self.parent = None
         self.total_msg  = 0
@@ -25,11 +26,10 @@ class Prospecting():
         self.ore = 0
         self.qty_cargo = 0
         self.load_config()
-        print(sys.version)
 
     def load_config(self,change = False):
         self.ip = config.get("EP_server_ip") or "37.59.36.212"
-        self.port = config.getint("EP_server_port") or 44988
+        self.port = int(config.get("EP_server_port")) or 44988
         self.session = config.get("EP_session") or "default"
 
         self.track_LTD = config.getint("EP_track_LTD")
@@ -39,9 +39,9 @@ class Prospecting():
         self.miss = config.getint("EP_miss")
         self.track_cargo = config.getint("EP_track_cargo")
 
-        self.ltd_threshold = config.getint("EP_LTD_t") or 18
-        self.painite_threshold = config.getint("EP_Painite_t") or 25
-        self.font_size = config.getint("EP_font_size") or 14
+        self.ltd_threshold = int(config.get("EP_LTD_t")) or 18
+        self.painite_threshold = int(config.get("EP_Painite_t")) or 25
+        self.font_size = int(config.get("EP_font_size")) or 14
 
         self.my_color = config.get("EP_my_color") or "Red"
         self.color = config.get("EP_color") or "Blue"
@@ -197,6 +197,8 @@ class Prospecting():
         except socket.error as e:
             print("error sending")
             print("Caught exception socket.error : %s" % e)
+            self.stop()
+        self.msg_send = True
 
     def connect(self):
         self.sock = socket.socket(socket.AF_INET , socket.SOCK_STREAM)
@@ -220,6 +222,7 @@ class Prospecting():
         time.sleep(1)
         self.sendMsg(json.dumps(con_succes).encode())
         threading.Thread(target=self.recvs).start()
+        threading.Thread(target=self.heart_beat).start()
         self.connection["text"] = "Connected"
         time.sleep(2)
         self.connection.grid_remove()
@@ -230,7 +233,6 @@ class Prospecting():
             "data" : self.session
         }
         if self.connected :
-
             self.sendMsg(json.dumps(to_send))
 
     def stop(self):
@@ -254,6 +256,19 @@ class Prospecting():
         data = self.sock.recv(self.buffer)
         return data.decode()
 
+    def heart_beat(self):
+        hb = {
+            "act" : "keep_alive",
+            "data" : "ping"
+        }
+        hb = json.dumps(hb)
+        while self.run:
+            if not self.msg_send:
+                self.sendMsg(hb)
+            else :
+                self.msg_send = False
+            time.sleep(10)
+
     def recvs(self):
         while self.run:
             try:
@@ -261,6 +276,7 @@ class Prospecting():
             except socket.error as e:
                 print("error receiving")
                 print("Caught exception socket.error : %s" % e)
+                self.stop()
 
             try:
                 decoded = json.loads(msg)
@@ -309,7 +325,6 @@ class Prospecting():
         duplicate = False
 
         mat_hash = hashlib.md5(json.dumps(entry["Materials"]).encode()).hexdigest()
-        print("mat hash : ", mat_hash)
 
         if mat_hash in self.hashlist :
             duplicate = True
