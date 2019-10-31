@@ -51,14 +51,14 @@ class ThreadClient(threading.Thread):
             except ValueError as e:
                 print("incorect format ",e)
                 print(msgClient.decode())
-                continue
+                break #something went wrong terminate connection
 
             #if client send QUIT => terminate the conenction
             if msg['act'] == "quit" :
                 print("client exitting")
                 conn_client[nom].send(quit_msg)
                 break
-            #client just wants to stay connected 
+            #client just wants to stay connected
             elif msg['act'] == "keep_alive":
                 conn_client[nom].send(hb)
                 continue
@@ -86,6 +86,7 @@ class ThreadClient(threading.Thread):
                         conn_client[name].send(msgClient)
                     except socket.error as e:
                         print("error sending ",str(e))
+                        break #terminate 
 
         # close connection :
         self.connexion.close()
