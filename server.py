@@ -17,6 +17,8 @@ conn_client = {}                # active connection array
 session_list = {}               #session list
 quit_msg = {"act": "quit"}
 quit_msg = json.dumps(quit_msg).encode()
+hb = {"act":"keep_alive","data":"pong"}
+hb = json.dumps(hb).encode()
 def receiveSignal(signalNumber, frame):
     print('Received Signal ', signalNumber)
     print("exiting..")
@@ -56,6 +58,10 @@ class ThreadClient(threading.Thread):
                 print("client exitting")
                 conn_client[nom].send(quit_msg)
                 break
+            #client just wants to stay connected 
+            elif msg['act'] == "keep_alive":
+                conn_client[nom].send(hb)
+                continue
             #change client session
             elif msg['act'] == "session" :
                 #remove from old one
