@@ -29,7 +29,7 @@ class Prospecting():
 
     def load_config(self,change = False):
         self.ip = config.get("EP_server_ip") or "37.59.36.212"
-        self.port = int(config.get("EP_server_port")) or 44988
+        self.port = int(config.get("EP_server_port") or 44988)
         self.session = config.get("EP_session") or "default"
 
         self.track_LTD = config.getint("EP_track_LTD")
@@ -39,9 +39,9 @@ class Prospecting():
         self.miss = config.getint("EP_miss")
         self.track_cargo = config.getint("EP_track_cargo")
 
-        self.ltd_threshold = int(config.get("EP_LTD_t")) or 18
-        self.painite_threshold = int(config.get("EP_Painite_t")) or 25
-        self.font_size = int(config.get("EP_font_size")) or 14
+        self.ltd_threshold = int(config.get("EP_LTD_t") or 18)
+        self.painite_threshold = int(config.get("EP_Painite_t") or 25)
+        self.font_size = int(config.get("EP_font_size") or 14)
 
         self.my_color = config.get("EP_my_color") or "Red"
         self.color = config.get("EP_color") or "Blue"
