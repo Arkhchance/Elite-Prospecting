@@ -2,7 +2,7 @@
 try:
     import tkinter as tk
 except ImportError:
-    import Tkinter as tk 
+    import Tkinter as tk
 import socket
 import sys
 import time
@@ -188,7 +188,7 @@ class Prospecting():
         else:
             self.hashlist.append(msg_hash)
 
-        if self.play_sound == 1 :
+        if self.play_sound == 1:
             self.sound.play()
 
         msg += " " + json_data['data']
@@ -323,7 +323,10 @@ class Prospecting():
             self.qty_cargo = entry['Count']
             if self.qty_cargo == 0:
                 self.ore = 0
-                self.hashlist.clear()
+                try:
+                    self.hashlist.clear()
+                except AttributeError:
+                    del self.hashlist[:]
             self.refresh_cargo()
 
     def refined_event(self):
