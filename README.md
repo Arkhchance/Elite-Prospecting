@@ -28,6 +28,10 @@ Download the `.zip` file [here](https://github.com/Arkhchance/Elite-Prospecting/
 
 Extract the content inside EDMC plugin's folder - (re)start EDMC
 
+Elite-Prospecting can play sound but it require playsound library
+```
+pip install playsound
+```
 
 Idea by [CMDR Fank](https://inara.cz/cmdr/162442/)
 

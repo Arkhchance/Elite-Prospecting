@@ -1,5 +1,8 @@
 #!/usr/bin/python
-import Tkinter as tk
+try:
+    import tkinter as tk
+except ImportError:
+    import Tkinter as tk 
 import socket
 import sys
 import time
@@ -7,6 +10,8 @@ import threading
 import hashlib
 import json
 from config import config
+from Sound import Sound
+
 
 class Prospecting():
     def __init__(self):
@@ -15,7 +20,7 @@ class Prospecting():
         self.msg_send = False
         self.run = True
         self.parent = None
-        self.total_msg  = 0
+        self.total_msg = 0
         self.messages = []
         self.hashlist = []
         self.colors = []
@@ -25,9 +30,10 @@ class Prospecting():
         self.buffer = 1024
         self.ore = 0
         self.qty_cargo = 0
+        self.sound = Sound()
         self.load_config()
 
-    def load_config(self,change = False):
+    def load_config(self, change = False):
         self.ip = config.get("EP_server_ip") or "37.59.36.212"
         self.port = int(config.get("EP_server_port") or 44988)
         self.session = config.get("EP_session") or "default"
@@ -38,6 +44,7 @@ class Prospecting():
         self.win_trans = config.getint("EP_win_trans")
         self.miss = config.getint("EP_miss")
         self.track_cargo = config.getint("EP_track_cargo")
+        self.play_sound = config.getint("EP_sound")
 
         self.ltd_threshold = int(config.get("EP_LTD_t") or 18)
         self.painite_threshold = int(config.get("EP_Painite_t") or 25)
@@ -49,7 +56,7 @@ class Prospecting():
         self.pos_x = config.getint("EP_pos_x") or 200
         self.pos_y = config.getint("EP_pos_y") or 200
 
-        #sanity check
+        # sanity check
         if len(self.session) > 15:
             self.session = "default"
 
@@ -59,7 +66,7 @@ class Prospecting():
             self.refresh_display()
             self.refresh_cargo()
 
-    def init_gui(self,parent):
+    def init_gui(self, parent):
         self.parent = parent
         self.frame = tk.Frame(self.parent, borderwidth=2)
         self.frame.grid(sticky=tk.NSEW, columnspan=2)
@@ -94,9 +101,9 @@ class Prospecting():
     def update_gui(self):
         try:
             self.window.destroy()
-        except AttributeError as e :
+        except AttributeError as e:
             print("window not created ", e)
-        if self.new_win == 1 :
+        if self.new_win == 1:
             self.win_x.grid()
             self.win_y.grid()
             self.mw_cargo.grid_remove()
@@ -104,7 +111,7 @@ class Prospecting():
                 self.mw_status[i].grid_remove()
 
             self.window = tk.Toplevel()
-            if sys.platform == 'win32' and self.win_trans == 1 :
+            if sys.platform == 'win32' and self.win_trans == 1:
                 self.window.attributes("-transparentcolor", 'black')
             self.window.wm_attributes("-topmost", True)
             self.window.overrideredirect(True)
@@ -118,15 +125,15 @@ class Prospecting():
                 self.status[i] = tk.Label(self.window)
                 self.status[i].config(font=("Courier", int(self.font_size)),background='black')
                 self.status[i].pack(side="top", fill="both", expand=True, padx=10, pady=10)
-                if i == 0 :
+                if i == 0:
                     self.status[i]['text'] = "Waiting..."
             self.window.wm_geometry('+' + str(self.pos_x) + '+' + str(self.pos_y))
-            if self.track_cargo == 0 :
+            if self.track_cargo == 0:
                 self.cargo.pack_forget()
-        else :
-            if self.track_cargo == 1 :
+        else:
+            if self.track_cargo == 1:
                 self.mw_cargo.grid()
-            else :
+            else:
                 self.mw_cargo.grid_remove()
             self.win_x.grid_remove()
             self.win_y.grid_remove()
@@ -136,20 +143,20 @@ class Prospecting():
     def update_new_win(self,val):
         self.pos_x = self.win_x.get()
         self.pos_y = self.win_y.get()
-        if self.new_win == 1 :
+        if self.new_win == 1:
             self.window.wm_geometry('+' + str(self.win_x.get()) + '+' + str(self.win_y.get()))
 
-    def display_msg(self,msg,mine=True):
-        if mine :
+    def display_msg(self, msg, mine=True):
+        if mine:
             color = "mine"
-        else :
+        else:
             color = "other"
 
         self.colors.append(color)
         self.messages.append(msg)
         self.total_msg += 1
 
-        if self.total_msg > self.total_msg_display :
+        if self.total_msg > self.total_msg_display:
             self.messages.pop(0)
             self.colors.pop(0)
             self.total_msg -= 1
@@ -160,29 +167,32 @@ class Prospecting():
         for i in range(len(self.messages)):
             if self.colors[i] == "mine":
                 color = self.my_color
-            else :
+            else:
                 color = self.color
-            if self.new_win == 1 :
+            if self.new_win == 1:
                 self.status[i].config(foreground=color)
                 self.status[i]['text'] = self.messages[i]
-            else :
+            else:
                 self.mw_status[i].config(foreground=color)
                 self.mw_status[i]['text'] = self.messages[i]
 
-    def process_msg(self,json_data):
+    def process_msg(self, json_data):
         msg_hash = json_data['hash']
         msg = json_data['cmdr']
-        if msg_hash in self.hashlist :
-            #duplicate !
+        if msg_hash in self.hashlist:
+            # duplicate !
             if self.miss == 1 :
                 msg += " duplicate"
-                self.display_msg(msg,False)
-            return #stop here
+                self.display_msg(msg, False)
+            return # stop here
         else:
             self.hashlist.append(msg_hash)
 
+        if self.play_sound == 1 :
+            self.sound.play()
+
         msg += " " + json_data['data']
-        self.display_msg(msg,False)
+        self.display_msg(msg, False)
 
     def refresh_cargo(self):
         if self.track_cargo == 1:
@@ -191,8 +201,8 @@ class Prospecting():
             else:
                 self.mw_cargo['text'] = "Cargo : " + str(self.qty_cargo) + " Ore : " + str(self.ore)
 
-    def sendMsg(self,message):
-        try :
+    def sendMsg(self, message):
+        try:
             self.sock.sendall(message.encode())
         except socket.error as e:
             print("error sending")
@@ -201,11 +211,11 @@ class Prospecting():
         self.msg_send = True
 
     def connect(self):
-        self.sock = socket.socket(socket.AF_INET , socket.SOCK_STREAM)
-        try :
+        self.sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        try:
             self.connection["text"] = "Connecting..."
-            print("connecting to ",self.ip)
-            self.sock.connect((self.ip , int(self.port)))
+            print("connecting to ", self.ip)
+            self.sock.connect((self.ip, int(self.port)))
 
         except socket.error as e:
             print("Caught exception socket.error : %s" % e)
@@ -232,7 +242,7 @@ class Prospecting():
             "act" : "session",
             "data" : self.session
         }
-        if self.connected :
+        if self.connected:
             self.sendMsg(json.dumps(to_send))
 
     def stop(self):
@@ -286,11 +296,11 @@ class Prospecting():
                 elif decoded['act'] == "event":
                     self.process_msg(decoded)
                 elif decoded['act'] == "connexion":
-                    self.display_msg(decoded['data'],True)
+                    self.display_msg(decoded['data'], True)
             except ValueError as e:
                 print("Bad formating ",e)
 
-    def publish(self,cmdr,name,prop,hash,duplicate):
+    def publish(self, cmdr, name, prop, hash, duplicate):
         data = name + " {:.2f}%"
         data = data.format(prop)
         message = {
@@ -300,16 +310,18 @@ class Prospecting():
             "hash" : hash
         }
 
-        if self.connected :
+        if self.connected:
             self.sendMsg(json.dumps(message))
-        if not duplicate :
+        if not duplicate:
+            if self.play_sound == 1:
+                self.sound.play()
             to_display = cmdr + " " + name + " {:.2f}%"
-            self.display_msg(to_display.format(prop),True)
+            self.display_msg(to_display.format(prop), True)
 
-    def cargo_event(self,entry):
+    def cargo_event(self, entry):
         if "Count" in entry:
             self.qty_cargo = entry['Count']
-            if self.qty_cargo == 0 :
+            if self.qty_cargo == 0:
                 self.ore = 0
                 self.hashlist.clear()
             self.refresh_cargo()
@@ -318,39 +330,39 @@ class Prospecting():
         self.ore += 1
         self.refresh_cargo()
 
-    def event(self,cmdr,entry):
-        #received a ProspectedAsteroid event
+    def event(self, cmdr, entry):
+        # received a ProspectedAsteroid event
         empty = True
         below_t = False
         duplicate = False
 
         mat_hash = hashlib.md5(json.dumps(entry["Materials"]).encode()).hexdigest()
 
-        if mat_hash in self.hashlist :
+        if mat_hash in self.hashlist:
             duplicate = True
-        else :
+        else:
             self.hashlist.append(mat_hash)
 
-        #check for materials
+        # check for materials
         for mat in entry['Materials']:
             if mat['Name'] == "LowTemperatureDiamond" and self.track_LTD == 1 :
                 if mat['Proportion'] > float(self.ltd_threshold):
-                    self.publish(cmdr,mat['Name_Localised'],mat['Proportion'],mat_hash,duplicate)
-                else :
+                    self.publish(cmdr, mat['Name_Localised'], mat['Proportion'], mat_hash, duplicate)
+                else:
                     below_t = True
                 empty = False
             elif mat['Name'] == "Painite" and self.track_Painite == 1 :
                 if mat['Proportion'] > float(self.painite_threshold):
-                    self.publish(cmdr,"Painite",mat['Proportion'],mat_hash,duplicate)
-                else :
+                    self.publish(cmdr, "Painite", mat['Proportion'], mat_hash, duplicate)
+                else:
                     below_t = True
                 empty = False
 
-        if self.miss == 1 :
-            if duplicate :
-                self.display_msg("Asteroid already prospected",True)
+        if self.miss == 1:
+            if duplicate:
+                self.display_msg("Asteroid already prospected", True)
                 return
             if empty and not below_t:
-                self.display_msg("Asteroid without materials",True)
-            if below_t :
-                self.display_msg("Threshold not met",True)
+                self.display_msg("Asteroid without materials", True)
+            if below_t:
+                self.display_msg("Threshold not met", True)
