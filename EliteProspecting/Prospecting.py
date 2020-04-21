@@ -3,7 +3,7 @@ try:
     import tkinter as tk
 except ImportError:
     import Tkinter as tk
-import socket
+import zmq
 import sys
 import time
 import threading
@@ -17,7 +17,6 @@ class Prospecting():
     def __init__(self):
         self.connected = False
         self.gui_init = False
-        self.msg_send = False
         self.run = True
         self.parent = None
         self.total_msg = 0
@@ -27,11 +26,14 @@ class Prospecting():
         self.total_msg_display = 6
         self.mw_status = [None] * self.total_msg_display
         self.status = [None] * self.total_msg_display
-        self.buffer = 1024
         self.ore = 0
         self.qty_cargo = 0
+        self.cmdr_name = ""
         self.sound = Sound()
         self.load_config()
+        self.context = zmq.Context()
+        self.msg_sender = self.context.socket(zmq.PUSH)
+        self.msg_receiver = self.context.socket(zmq.SUB)
 
     def load_config(self, change = False):
         self.ip = config.get("EP_server_ip") or "37.59.36.212"
@@ -61,7 +63,6 @@ class Prospecting():
             self.session = "default"
 
         if change :
-            self.change_session()
             self.update_gui()
             self.refresh_display()
             self.refresh_cargo()
@@ -203,47 +204,32 @@ class Prospecting():
 
     def sendMsg(self, message):
         try:
-            self.sock.sendall(message.encode())
-        except socket.error as e:
+            self.msg_sender.send_json(message)
+        except ZMQError as e:
             print("error sending")
-            print("Caught exception socket.error : %s" % e)
+            print("Caught exception : %s" % e)
             self.stop()
-        self.msg_send = True
 
     def connect(self):
-        self.sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        self.connection["text"] = "Connecting..."
         try:
-            self.connection["text"] = "Connecting..."
             print("connecting to ", self.ip)
-            self.sock.connect((self.ip, int(self.port)))
-
-        except socket.error as e:
-            print("Caught exception socket.error : %s" % e)
+            self.msg_sender.connect("tcp://{}:{}".format(self.ip,self.port))
+            self.msg_receiver.connect("tcp://{}:{}".format(self.ip,self.port+1))
+            self.msg_receiver.setsockopt_string(zmq.SUBSCRIBE, "")
+        except ZMQError as e:
+            print("Caught exception %s" % e)
             print("Error connecting")
             self.connection["text"] = "Error connecting check configuration"
             return
 
-        con_succes = {
-            "act" : "connexion",
-            "data" : "Player join"
-        }
         self.connected = True
-        self.change_session()
         time.sleep(1)
-        self.sendMsg(json.dumps(con_succes).encode())
         threading.Thread(target=self.recvs).start()
-        threading.Thread(target=self.heart_beat).start()
         self.connection["text"] = "Connected"
         time.sleep(2)
         self.connection.grid_remove()
 
-    def change_session(self):
-        to_send = {
-            "act" : "session",
-            "data" : self.session
-        }
-        if self.connected:
-            self.sendMsg(json.dumps(to_send))
 
     def stop(self):
         config.set("EP_pos_x", self.pos_x)
@@ -252,51 +238,20 @@ class Prospecting():
             return
         self.run = False
         self.connected = False
-        quit_msg = {"act": "quit"}
-        self.sendMsg(json.dumps(quit_msg))
-        time.sleep(1)
-        try:
-            self.sock.close()
-        except socket.error as e:
-            print("socket.error : %s" % e)
-
-        self.connection.grid()
-
-    def recvMsg(self):
-        data = self.sock.recv(self.buffer)
-        return data.decode()
-
-    def heart_beat(self):
-        hb = {
-            "act" : "keep_alive",
-            "data" : "ping"
-        }
-        hb = json.dumps(hb)
-        while self.run:
-            if not self.msg_send:
-                self.sendMsg(hb)
-            else :
-                self.msg_send = False
-            time.sleep(10)
+        self.msg_receiver.close()
+        self.msg_sender.close()
+        self.context.term()
 
     def recvs(self):
         while self.run:
+            msg = self.msg_receiver.recv_json()
             try:
-                msg = self.recvMsg()
-            except socket.error as e:
-                print("error receiving")
-                print("Caught exception socket.error : %s" % e)
-                self.stop()
-
-            try:
-                decoded = json.loads(msg)
-                if decoded['act'] == "quit":
-                    self.stop()
-                    break
-                elif decoded['act'] == "event":
-                    self.process_msg(decoded)
-                elif decoded['act'] == "connexion":
-                    self.display_msg(decoded['data'], True)
+                if msg['session'] != self.session or msg['cmdr'] == self.cmdr_name:
+                    continue
+                if msg['act'] == "event":
+                    self.process_msg(msg)
+                elif msg['act'] == "connexion":
+                    self.display_msg(msg['data'], True)
             except ValueError as e:
                 print("Bad formating ",e)
 
@@ -307,11 +262,12 @@ class Prospecting():
             "act" : "event",
             "cmdr" : cmdr,
             "data" : data,
-            "hash" : hash
+            "hash" : hash,
+            "session" : self.session
         }
 
         if self.connected:
-            self.sendMsg(json.dumps(message))
+            self.sendMsg(message)
         if not duplicate:
             if self.play_sound == 1:
                 self.sound.play()
@@ -338,7 +294,7 @@ class Prospecting():
         empty = True
         below_t = False
         duplicate = False
-
+        self.cmdr_name = cmdr
         mat_hash = hashlib.md5(json.dumps(entry["Materials"]).encode()).hexdigest()
 
         if mat_hash in self.hashlist:
