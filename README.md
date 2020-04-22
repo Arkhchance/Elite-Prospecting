@@ -1,5 +1,6 @@
 # Elite-Prospecting
-
+Elite-Prospecting is depreciated
+use [EliteProspecting2](https://github.com/Arkhchance/EliteProspecting2)
 
 Elite-Prospecting is an EDMC plugin design for miners and wing miners to help you prospecting.
 It shows you (and your wing mates) the content of your prospector limpet only if above your threshold
@@ -28,7 +29,7 @@ Download the `.zip` file [here](https://github.com/Arkhchance/Elite-Prospecting/
 
 Extract the content inside EDMC plugin's folder - (re)start EDMC
 
-Elite-Prospecting can play sound but it require playsound library and it only works with beta version of [EDMC](https://github.com/Marginal/EDMarketConnector/releases/tag/rel-350-0) 
+Elite-Prospecting can play sound but it require playsound library and it only works with beta version of [EDMC](https://github.com/Marginal/EDMarketConnector/releases/tag/rel-350-0)
 ```
 pip install playsound
 ```
